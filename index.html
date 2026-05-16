@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Шинопоиск — Калькулятор шиномонтажа</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #fef5f5;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .calculator-card {
+            max-width: 980px;
+            width: 100%;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -10px rgba(180, 40, 40, 0.2);
+            overflow: hidden;
+            border: 1px solid #ffcdcd;
+        }
+
+        .calc-header {
+            background: #b11f1f;
+            background: linear-gradient(135deg, #9e1a1a 0%, #c42d2d 100%);
+            padding: 22px 28px;
+        }
+
+        .calc-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .calc-header h1::before {
+            content: "🛞";
+            font-size: 1.8rem;
+        }
+
+        .calc-header p {
+            color: #ffe0e0;
+            font-size: 0.85rem;
+            margin-top: 6px;
+        }
+
+        .calc-body {
+            padding: 28px 28px 34px;
+        }
+
+        .field-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #8b2c2c;
+            margin-bottom: 8px;
+        }
+
+        /* ========= КРАСИВЫЙ ВЫПАДАЮЩИЙ СПИСОК (скруглённый, красный hover) ========= */
+        .custom-select {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 1rem;
+            border: 1.5px solid #f0c0c0;
+            border-radius: 28px;
+            background: white;
+            font-family: inherit;
+            transition: 0.2s;
+            cursor: pointer;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%23b11f1f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 18px;
+        }
+
+        .custom-select:focus {
+            outline: none;
+            border-color: #b11f1f;
+            box-shadow: 0 0 0 3px rgba(177, 31, 31, 0.15);
+        }
+
+        /* Кастомный стиль для option внутри select (работает в большинстве браузеров) */
+        .custom-select option {
+            padding: 12px;
+            background: white;
+            color: #3d2a2a;
+            transition: 0.1s;
+        }
+
+        .custom-select option:hover,
+        .custom-select option:focus,
+        .custom-select option:checked {
+            background: #b11f1f !important;
+            color: white !important;
+        }
+
+        /* Для Firefox — изменение цвета фона при наведении через background */
+        .custom-select:-moz-focusring {
+            color: transparent;
+            text-shadow: 0 0 0 #000;
+        }
+
+        /* Для Chrome/Safari — более плавное выделение */
+        .custom-select option:checked {
+            background: #b11f1f linear-gradient(0deg, #b11f1f 0%, #b11f1f 100%);
+            color: white;
+        }
+
+        /* Дополнительно для webkit (псевдостили) */
+        select.custom-select {
+            background-color: white;
+        }
+
+        /* Красный фон для выбранного элемента и при наведении */
+        select.custom-select option:hover {
+            background-color: #c03939 !important;
+            color: white !important;
+        }
+
+        /* Сброс стилей для остальных селектов */
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 1rem;
+            border: 1.5px solid #f0c0c0;
+            border-radius: 28px;
+            background: white;
+            font-family: inherit;
+            transition: 0.2s;
+            cursor: pointer;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%23b11f1f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 18px;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #b11f1f;
+            box-shadow: 0 0 0 3px rgba(177, 31, 31, 0.15);
+        }
+
+        /* Улучшенный стиль для option во всех селектах */
+        select option {
+            padding: 10px;
+            background-color: white;
+            color: #3d2a2a;
+        }
+
+        select option:hover,
+        select option:focus,
+        select option:checked {
+            background: #b11f1f !important;
+            color: white !important;
+        }
+
+        /* Красный чекбокс скидки */
+        .discount-check {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0 28px;
+            background: #fff8f8;
+            padding: 12px 18px;
+            border-radius: 60px;
+            border: 1px solid #ffdbdb;
+        }
+
+        .discount-check input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #b11f1f;
+        }
+
+        .discount-check label {
+            margin: 0;
+            font-weight: 500;
+            cursor: pointer;
+            color: #5e2a2a;
+        }
+
+        /* Кнопки */
+        .button-group {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .calc-button, .reset-button {
+            flex: 1;
+            padding: 14px 20px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 48px;
+            cursor: pointer;
+            font-family: inherit;
+            border: none;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .calc-button {
+            background: #b11f1f;
+            color: white;
+            box-shadow: 0 2px 8px rgba(177, 31, 31, 0.3);
+        }
+
+        .calc-button:hover {
+            background: #8e1818;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(177, 31, 31, 0.3);
+        }
+
+        .reset-button {
+            background: #fff0f0;
+            color: #b11f1f;
+            border: 1px solid #ffbcbc;
+        }
+
+        .reset-button:hover {
+            background: #ffe0e0;
+            border-color: #e09f9f;
+        }
+
+        /* Блок результата */
+        .price-result {
+            background: #fffafa;
+            border-radius: 28px;
+            padding: 20px 24px;
+            border-left: 6px solid #b11f1f;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .price-result.hidden-result { display: none; }
+        .price-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            color: #b67272;
+        }
+        .final-price {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: #861a1a;
+        }
+        .discount-badge {
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: #217a4b;
+            background: #e0f0e8;
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 40px;
+        }
+        .service-detail {
+            font-size: 0.75rem;
+            margin-top: 12px;
+            color: #b76b6b;
+            border-top: 1px dashed #ffcdcd;
+            padding-top: 10px;
+        }
+
+        /* Дополнительные услуги */
+        .additional-services {
+            margin-top: 28px;
+            background: #ffffff;
+            border-radius: 24px;
+            border: 1px solid #ffdddd;
+        }
+        .additional-title {
+            background: #fff8f8;
+            padding: 16px 20px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #a12f2f;
+            border-bottom: 1px solid #ffdddd;
+        }
+        .services-grid {
+            padding: 16px 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 14px 20px;
+        }
+        .service-check {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+        }
+        .service-check input { width: 18px; height: 18px; cursor: pointer; accent-color: #b11f1f; }
+        .service-check label { margin: 0; font-weight: 500; cursor: pointer; color: #4a2a2a; }
+        .service-price { color: #b11f1f; font-weight: 600; margin-left: auto; white-space: nowrap; }
+        .subgroup { margin-top: 16px; padding-top: 12px; border-top: 1px dashed #ffcdcd; }
+        .subgroup-title { font-weight: 700; color: #a12f2f; margin-bottom: 12px; font-size: 0.9rem; }
+        .total-additional {
+            margin-top: 18px;
+            padding: 12px 20px;
+            background: #fff8f8;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #ffdddd;
+        }
+        .grand-total {
+            margin-top: 20px;
+            padding: 14px 20px;
+            background: #fff1f1;
+            border-radius: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #861a1a;
+        }
+        .note { font-size: 12px; color: #b98b8b; margin-top: 16px; text-align: center; }
+
+        /* Подсказка (тайтл) для пакетов */
+        .tooltip-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            background: #f0cfcf;
+            color: #a11f1f;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: help;
+            position: relative;
+        }
+        .tooltip-icon:hover::after {
+            content: attr(data-title);
+            position: absolute;
+            left: 0;
+            top: 24px;
+            background: #1e2f3e;
+            color: white;
+            font-size: 12px;
+            font-weight: normal;
+            padding: 8px 12px;
+            border-radius: 12px;
+            white-space: pre-wrap;
+            width: 280px;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            line-height: 1.4;
+            font-weight: 400;
+            text-align: left;
+        }
+        .package-price {
+            font-size: 0.85rem;
+            color: #b11f1f;
+            font-weight: 600;
+        }
+        .note-small {
+            font-size: 0.7rem;
+            color: #b98b8b;
+            padding: 8px 20px 12px;
+        }
+    </style>
+</head>
+<body>
+<div class="calculator-card">
+    <div class="calc-header">
+        <h1>Шинопоиск</h1>
+        <p>Калькулятор шиномонтажа — точные цены, пакеты и доп. услуги</p>
+    </div>
+    <div class="calc-body">
+        <!-- Тип авто -->
+        <div class="field-group">
+            <label>🚘 Тип автомобиля</label>
+            <select id="carType" class="custom-select">
+                <option value="sedan">Легковой автомобиль</option>
+                <option value="crossover_minivan">Кроссовер / Минивэн</option>
+                <option value="suv">Внедорожник (SUV)</option>
+            </select>
+        </div>
+
+        <!-- Диаметр -->
+        <div class="field-group">
+            <label>⚙️ Диаметр колеса (дюймы)</label>
+            <select id="wheelDiameter" class="custom-select"></select>
+        </div>
+
+        <!-- Услуга -->
+        <div class="field-group">
+            <label>🔧 Выберите услугу</label>
+            <select id="serviceType" class="custom-select">
+                <option value="mount_dismount">Снятие и установка (комплект / 1 колесо)</option>
+                <option value="tire_remount">Шиномонтаж: демонтаж + монтаж (комплект / 1 колесо)</option>
+                <option value="balancing">Балансировка (комплект / 1 колесо)</option>
+                <option value="complex">Комплекс шиномонтажа (комплект / 1 колесо)</option>
+            </select>
+        </div>
+
+        <!-- Пакет обслуживания с ВЕРНЫМИ описаниями -->
+        <div class="field-group">
+            <label>📦 Пакет обслуживания 
+                <span class="tooltip-icon" data-title="Стандарт: базовая мойка колёс, визуальный осмотр. Комфорт: + clean hubs, бортировка, шумоизоляция. Премиум: + антикоррозийная обработка дисков, балансировка с грузом-липучкой, выравнивание геометрии.">ⓘ</span>
+            </label>
+            <select id="packageSelect" class="custom-select">
+                <option value="standard" data-price="0">Стандарт (0 ₽)</option>
+                <option value="comfort" data-price="600">Комфорт (+600 ₽)</option>
+                <option value="premium" data-price="1500">Премиум (+1500 ₽)</option>
+            </select>
+            <div style="font-size: 12px; color: #c07373; margin-top: 6px;">ℹ️ Наведите на значок ⓘ, чтобы увидеть, что входит в пакет</div>
+        </div>
+
+        <!-- Дисконтная карта -->
+        <div class="discount-check">
+            <input type="checkbox" id="discountCard">
+            <label for="discountCard">💳 У меня есть дисконтная карта (скидка 10%)</label>
+        </div>
+
+        <div class="button-group">
+            <button class="calc-button" id="calculateBtn">Рассчитать стоимость</button>
+            <button class="reset-button" id="resetBtn">Сбросить всё</button>
+        </div>
+
+        <!-- Блок итога основной услуги -->
+        <div id="priceResultBlock" class="price-result hidden-result">
+            <div class="price-label">ИТОГОВАЯ СТОИМОСТЬ (основная услуга)</div>
+            <div class="final-price" id="finalPriceValue">0 ₽</div>
+            <div id="discountInfo" class="discount-badge" style="display: none;"></div>
+            <div id="serviceDetailBlock" class="service-detail"></div>
+        </div>
+
+        <!-- Блок дополнительных услуг -->
+        <div id="additionalBlock" style="display: none;">
+            <div class="additional-services">
+                <div class="additional-title">➕ Стоимость дополнительных услуг (за 1 колесо)</div>
+                <div class="services-grid" id="additionalChecklist"></div>
+                <div class="total-additional">
+                    <span>💰 Дополнительные услуги:</span>
+                    <span id="additionalCost">0 ₽</span>
+                </div>
+                <div class="total-additional" style="background:#fff5f5;">
+                    <span>🎁 Пакет обслуживания:</span>
+                    <span id="packageCostSpan">0 ₽</span>
+                </div>
+                <div class="grand-total" id="grandTotalBlock">
+                    <span>🏆 ИТОГО (осн. услуга + пакет + допы):</span>
+                    <span id="grandTotalSum">0 ₽</span>
+                </div>
+                <div class="note-small">* Ремонт покрышки (установка жгута / заплатки) — снятие, установка, шиномонтаж оплачиваются отдельно по основному прайсу.<br>** TPMS: обслуживание/замена/программирование за колесо.</div>
+            </div>
+        </div>
+        <div class="note">*Цены указаны согласно прайсу: комплект / 1 колесо. Пакет добавляется к итогу.</div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ---------- ТАБЛИЦЫ ЦЕН (точные) ----------
+        const sedanPrices = {
+            13: { mount_dismount: 600, tire_remount: 680, balancing: 520, complex: 1800 },
+            14: { mount_dismount: 600, tire_remount: 680, balancing: 520, complex: 1800 },
+            15: { mount_dismount: 700, tire_remount: 780, balancing: 600, complex: 2080 },
+            16: { mount_dismount: 760, tire_remount: 840, balancing: 660, complex: 2260 },
+            17: { mount_dismount: 840, tire_remount: 940, balancing: 740, complex: 2520 },
+            18: { mount_dismount: 920, tire_remount: 1040, balancing: 800, complex: 2760 },
+            19: { mount_dismount: 1080, tire_remount: 1200, balancing: 920, complex: 3200 },
+            20: { mount_dismount: 1180, tire_remount: 1300, balancing: 1020, complex: 3500 },
+            21: { mount_dismount: 1180, tire_remount: 1300, balancing: 1020, complex: 3500 },
+            22: { mount_dismount: 1180, tire_remount: 1300, balancing: 1020, complex: 3500 },
+            23: { mount_dismount: 1180, tire_remount: 1300, balancing: 1020, complex: 3500 },
+            24: { mount_dismount: 1180, tire_remount: 1300, balancing: 1020, complex: 3500 }
+        };
+        const crossoverPrices = {
+            13: { mount_dismount: 800, tire_remount: 880, balancing: 680, complex: 2360 },
+            14: { mount_dismount: 800, tire_remount: 880, balancing: 680, complex: 2360 },
+            15: { mount_dismount: 800, tire_remount: 880, balancing: 680, complex: 2360 },
+            16: { mount_dismount: 900, tire_remount: 980, balancing: 780, complex: 2660 },
+            17: { mount_dismount: 980, tire_remount: 1100, balancing: 860, complex: 2940 },
+            18: { mount_dismount: 1080, tire_remount: 1200, balancing: 920, complex: 3200 },
+            19: { mount_dismount: 1140, tire_remount: 1280, balancing: 980, complex: 3400 },
+            20: { mount_dismount: 1200, tire_remount: 1360, balancing: 1040, complex: 3600 },
+            21: { mount_dismount: 1280, tire_remount: 1420, balancing: 1100, complex: 3800 },
+            22: { mount_dismount: 1500, tire_remount: 1700, balancing: 1300, complex: 4500 },
+            23: { mount_dismount: 1500, tire_remount: 1700, balancing: 1300, complex: 4500 },
+            24: { mount_dismount: 1500, tire_remount: 1700, balancing: 1300, complex: 4500 }
+        };
+        const suvPrices = {
+            13: { mount_dismount: 880, tire_remount: 960, balancing: 760, complex: 2600 },
+            14: { mount_dismount: 880, tire_remount: 960, balancing: 760, complex: 2600 },
+            15: { mount_dismount: 880, tire_remount: 960, balancing: 760, complex: 2600 },
+            16: { mount_dismount: 980, tire_remount: 1100, balancing: 860, complex: 2940 },
+            17: { mount_dismount: 1080, tire_remount: 1220, balancing: 940, complex: 3240 },
+            18: { mount_dismount: 1180, tire_remount: 1320, balancing: 1020, complex: 3520 },
+            19: { mount_dismount: 1260, tire_remount: 1400, balancing: 1080, complex: 3740 },
+            20: { mount_dismount: 1320, tire_remount: 1500, balancing: 1140, complex: 3960 },
+            21: { mount_dismount: 1400, tire_remount: 1560, balancing: 1220, complex: 4180 },
+            22: { mount_dismount: 1660, tire_remount: 1860, balancing: 1440, complex: 4960 },
+            23: { mount_dismount: 1660, tire_remount: 1860, balancing: 1440, complex: 4960 },
+            24: { mount_dismount: 1660, tire_remount: 1860, balancing: 1440, complex: 4960 }
+        };
+
+        function getBasePrice(carType, diameter, serviceKey) {
+            let table = carType === 'sedan' ? sedanPrices : (carType === 'crossover_minivan' ? crossoverPrices : suvPrices);
+            if (!table[diameter]) {
+                let keys = Object.keys(table).map(Number).sort((a,b)=>a-b);
+                let closest = keys[0];
+                for(let d of keys) if(d <= diameter) closest = d;
+                return table[closest]?.[serviceKey] || 1500;
+            }
+            return table[diameter]?.[serviceKey] || 1500;
+        }
+
+        // Доп. услуги
+        const additionalServices = [
+            { id: "tire_at", name: "Шины AT", price: 100 },
+            { id: "tire_mt", name: "Шины MT", price: 150 },
+            { id: "runflat", name: "Шины Run Flat", price: 150 },
+            { id: "low_profile", name: "Низкий профиль (<45)", price: 100 },
+            { id: "valve", name: "Установка вентиля", price: 75 },
+            { id: "tpms_sensor", name: "Установка датчика давления в шинах", price: 100 },
+            { id: "mount_camera", name: "Монтаж камеры", price: 50 },
+            { id: "demount_camera", name: "Демонтаж камеры", price: 50 }
+        ];
+        const repairServices = [
+            { id: "repair_cord", name: "установка жгута", price: 250, from: true },
+            { id: "repair_patch", name: "установка заплатки", price: 250, from: true }
+        ];
+        const tpmsServices = [
+            { id: "tpms_service", name: "обслуживание датчика", price: 300 },
+            { id: "tpms_replace", name: "замена датчика", price: 800 },
+            { id: "tpms_program", name: "программирование / адаптация", price: 1000 }
+        ];
+
+        function buildAdditionalHTML() {
+            let html = '';
+            additionalServices.forEach(s => {
+                html += `<div class="service-check">
+                            <input type="checkbox" id="${s.id}" data-price="${s.price}">
+                            <label for="${s.id}">${s.name}</label>
+                            <span class="service-price">${s.price} ₽</span>
+                         </div>`;
+            });
+            html += `<div class="subgroup"><div class="subgroup-title">🛠️ Стоимость ремонта покрышки* (за 1 колесо):</div>`;
+            repairServices.forEach(s => {
+                let priceText = s.from ? `от ${s.price} ₽` : `${s.price} ₽`;
+                html += `<div class="service-check">
+                            <input type="checkbox" id="${s.id}" data-price="${s.price}" data-from="${s.from}">
+                            <label for="${s.id}">${s.name} ${s.from ? '(от)' : ''}</label>
+                            <span class="service-price">${priceText}</span>
+                         </div>`;
+            });
+            html += `</div><div class="subgroup"><div class="subgroup-title">📡 Стоимость TPMS:</div>`;
+            tpmsServices.forEach(s => {
+                html += `<div class="service-check">
+                            <input type="checkbox" id="${s.id}" data-price="${s.price}">
+                            <label for="${s.id}">${s.name}</label>
+                            <span class="service-price">${s.price} ₽</span>
+                         </div>`;
+            });
+            html += `</div>`;
+            return html;
+        }
+
+        // Заполнение диаметров
+        const diameterSelect = document.getElementById('wheelDiameter');
+        for(let i=13;i<=24;i++) {
+            let opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = i+'″';
+            if(i===16) opt.selected = true;
+            diameterSelect.appendChild(opt);
+        }
+
+        function getPackagePrice() {
+            const select = document.getElementById('packageSelect');
+            return parseInt(select.options[select.selectedIndex].getAttribute('data-price')) || 0;
+        }
+
+        function computeMainTotal() {
+            const carType = document.getElementById('carType').value;
+            const diameter = parseInt(document.getElementById('wheelDiameter').value,10);
+            const service = document.getElementById('serviceType').value;
+            const hasDiscount = document.getElementById('discountCard').checked;
+            let base = getBasePrice(carType, diameter, service);
+            let discount = hasDiscount ? Math.round(base * 0.1) : 0;
+            let final = base - discount;
+            return { base, discount, final, hasDiscount, carType, diameter, service };
+        }
+
+        function getAdditionalSum() {
+            let sum = 0;
+            const allCheckboxes = document.querySelectorAll('#additionalBlock input[type="checkbox"]');
+            allCheckboxes.forEach(cb => {
+                if(cb.checked) {
+                    let price = parseFloat(cb.getAttribute('data-price'));
+                    if(!isNaN(price)) sum += price;
+                }
+            });
+            return sum;
+        }
+
+        function updateFullUI() {
+            const main = computeMainTotal();
+            const packagePrice = getPackagePrice();
+            const priceBlock = document.getElementById('priceResultBlock');
+            const additionalContainer = document.getElementById('additionalBlock');
+            const finalSpan = document.getElementById('finalPriceValue');
+            const discountDiv = document.getElementById('discountInfo');
+            const serviceDetailSpan = document.getElementById('serviceDetailBlock');
+
+            if(priceBlock.classList.contains('hidden-result')) priceBlock.classList.remove('hidden-result');
+            if(additionalContainer) additionalContainer.style.display = 'block';
+
+            finalSpan.innerHTML = main.final.toLocaleString('ru-RU') + ' ₽';
+            if(main.hasDiscount && main.discount>0) {
+                discountDiv.style.display = 'inline-block';
+                discountDiv.innerHTML = `💳 Скидка 10% (${main.discount.toLocaleString('ru-RU')} ₽)`;
+                if(!document.getElementById('basePriceHint')) {
+                    let hint = document.createElement('div');
+                    hint.id = 'basePriceHint';
+                    hint.style.fontSize='0.8rem';
+                    hint.style.marginTop='6px';
+                    hint.style.color='#b96f6f';
+                    hint.innerHTML = `💰 Базовая цена: ${main.base.toLocaleString('ru-RU')} ₽`;
+                    finalSpan.parentNode.insertBefore(hint, discountDiv.nextSibling);
+                } else {
+                    document.getElementById('basePriceHint').innerHTML = `💰 Базовая цена: ${main.base.toLocaleString('ru-RU')} ₽`;
+                }
+            } else {
+                discountDiv.style.display = 'none';
+                let hint = document.getElementById('basePriceHint');
+                if(hint) hint.remove();
+            }
+
+            let carTypeName = document.querySelector('#carType option:checked')?.text || '';
+            let serviceName = document.querySelector('#serviceType option:checked')?.text || '';
+            serviceDetailSpan.innerHTML = `📌 ${carTypeName} • ${main.diameter}″ • ${serviceName}`;
+
+            let additionalSum = getAdditionalSum();
+            document.getElementById('additionalCost').innerText = additionalSum.toLocaleString('ru-RU') + ' ₽';
+            document.getElementById('packageCostSpan').innerText = packagePrice.toLocaleString('ru-RU') + ' ₽';
+            let grand = main.final + additionalSum + packagePrice;
+            document.getElementById('grandTotalSum').innerText = grand.toLocaleString('ru-RU') + ' ₽';
+        }
+
+        function resetAll() {
+            document.getElementById('carType').value = 'sedan';
+            for(let i=0;i<diameterSelect.options.length;i++) {
+                if(diameterSelect.options[i].value === '16') { diameterSelect.selectedIndex = i; break; }
+            }
+            document.getElementById('serviceType').selectedIndex = 0;
+            document.getElementById('discountCard').checked = false;
+            document.getElementById('packageSelect').selectedIndex = 0;
+            const allChecks = document.querySelectorAll('#additionalBlock input[type="checkbox"]');
+            allChecks.forEach(cb => cb.checked = false);
+
+            const priceBlock = document.getElementById('priceResultBlock');
+            if(priceBlock && !priceBlock.classList.contains('hidden-result')) priceBlock.classList.add('hidden-result');
+            const addBlock = document.getElementById('additionalBlock');
+            if(addBlock) addBlock.style.display = 'none';
+            const hint = document.getElementById('basePriceHint');
+            if(hint) hint.remove();
+        }
+
+        const checklistDiv = document.getElementById('additionalChecklist');
+        if(checklistDiv) checklistDiv.innerHTML = buildAdditionalHTML();
+
+        document.getElementById('calculateBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            updateFullUI();
+        });
+        document.getElementById('resetBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            resetAll();
+        });
+
+        let isVisible = false;
+        const resultBlockObs = document.getElementById('priceResultBlock');
+        const observer = new MutationObserver(() => {
+            isVisible = resultBlockObs && !resultBlockObs.classList.contains('hidden-result');
+        });
+        if(resultBlockObs) observer.observe(resultBlockObs, { attributes: true, attributeFilter: ['class'] });
+
+        function autoRefresh() { if(isVisible) updateFullUI(); }
+        document.getElementById('carType').addEventListener('change', autoRefresh);
+        document.getElementById('wheelDiameter').addEventListener('change', autoRefresh);
+        document.getElementById('serviceType').addEventListener('change', autoRefresh);
+        document.getElementById('discountCard').addEventListener('change', autoRefresh);
+        document.getElementById('packageSelect').addEventListener('change', autoRefresh);
+        document.querySelector('#additionalBlock')?.addEventListener('change', (e) => {
+            if(e.target && e.target.type === 'checkbox' && isVisible) updateFullUI();
+        });
+    })();
+</script>
+</body>
+</html>
