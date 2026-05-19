@@ -961,10 +961,10 @@
 
         document.getElementById('bookingInfoPreview').innerHTML = `
           <p><strong>Вы записываетесь:</strong></p>
-          <p>📋 ${service.name}</p>
-          <p>📅 ${selectedDay.date} в ${selectedTime}</p>
-          <p>📍 ${shortAddress}</p>
-          <div class="service-line">⚙️ ${currentCalcParams.carType} • ${currentCalcParams.diameter}″ • ${currentCalcParams.serviceName}</div>
+          <p>${service.name}</p>
+          <p>${selectedDay.date} в ${selectedTime}</p>
+          <p>${shortAddress}</p>
+          <div class="service-line">${currentCalcParams.carType} • ${currentCalcParams.diameter}″ • ${currentCalcParams.serviceName}</div>
         `;
 
         document.getElementById('phoneInput').value = formData.phone;
