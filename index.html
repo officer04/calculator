@@ -1,973 +1,1408 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover"
+    />
     <title>ШИНОПОИСК — запись на шиномонтаж</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
 
-        body {
-            background: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 12px;
-        }
+      body {
+        background: #ffffff;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 12px;
+      }
 
-        .app-container {
-            max-width: 480px;
-            width: 100%;
-            margin: 0 auto;
-            background: #ffffff;
-            border-radius: 28px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-            min-height: 680px;
-            display: flex;
-            flex-direction: column;
-        }
+      .app-container {
+        max-width: 480px;
+        width: 100%;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 28px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        min-height: 680px;
+        display: flex;
+        flex-direction: column;
+      }
 
-        .screen {
-            display: none;
-            flex-direction: column;
-            padding: 24px 20px 32px;
-            background: white;
-            align-items: center;
-        }
+      .screen {
+        display: none;
+        flex-direction: column;
+        padding: 24px 20px 32px;
+        background: white;
+        align-items: center;
+      }
 
-        .screen.active {
-            display: flex;
-        }
+      .screen.active {
+        display: flex;
+      }
 
-        h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #000000;
-            margin-bottom: 8px;
-            text-align: center;
-        }
+      h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #000000;
+        margin-bottom: 8px;
+        text-align: center;
+      }
 
-        h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #000000;
-            margin-bottom: 12px;
-        }
+      h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #000000;
+        margin-bottom: 12px;
+      }
 
-        .subhead {
-            font-size: 0.85rem;
-            color: #de002b;
-            margin-bottom: 24px;
-            align-items: center;
-        }
-        
-        .subhead-center {
-            font-size: 1rem;
-            font-weight: 500;
-            color: #de002b;
-            text-align: center;
-            margin-bottom: 20px;
-            padding: 10px;
-            border-radius: 30px;
-        }
+      .subhead {
+        font-size: 0.85rem;
+        color: #de002b;
+        margin-bottom: 24px;
+      }
 
-        /* Карточки услуг */
-        .options-grid, .address-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 28px;
-        }
+      .subhead-center {
+        font-size: 1rem;
+        font-weight: 500;
+        color: #de002b;
+        text-align: center;
+        margin-bottom: 20px;
+        padding: 10px;
+        border-radius: 30px;
+      }
 
-        .option-card {
-            border-radius: 16px;
-            padding: 16px 18px;
-            border: 1px solid #e8e8e8;
-            transition: all 0.2s;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .option-card.selected {
-            background: #fff0f2;
-            border-color: #de002b;
-            border-left: 4px solid #de002b;
-        }
-        
-        .option-info {
-            flex: 1;
-        }
-        
-        .option-img {
-            width: 100px;
-            height: 100px;
-            object-fit: contain;
-        }
+      /* Таймер */
+      .timer-container {
+        background: #fff0f2;
+        border-radius: 16px;
+        padding: 12px 16px;
+        margin-bottom: 20px;
+        text-align: center;
+        width: 100%;
+      }
 
-        .option-title {
-            font-weight: 700;
-            font-size: 1.05rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-            color: #de002b;
-        }
+      .timer-text {
+        font-size: 0.85rem;
+        color: #de002b;
+        margin-bottom: 6px;
+      }
 
-        .option-desc {
-            font-size: 0.8rem;
-            color: #777777;
-        }
+      .timer {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #de002b;
+        font-family: monospace;
+      }
 
-        .price-badge {
-            background: white;
-            padding: 4px 12px;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #de002b;
-            border: 1px solid #ffccd4;
-            display: inline-block;
-        }
+      /* Карточки услуг */
+      .options-grid,
+      .address-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 28px;
+        width: 100%;
+      }
 
-        /* Стиль карточки адреса с иконкой слева */
-        .address-item {
-            height: 120px;
-            border-radius: 16px;
-            padding: 16px 18px;
-            border: 1px solid #e8e8e8;
-            transition: all 0.2s;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.9rem;
-            color: #000000;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        
-        .address-item.selected {
-            background: #fff0f2;
-            border-color: #de002b;
-            border-left: 4px solid #de002b;
-        }
-        
-        .address-icon {
-            width: 28px;
-            height: 28px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .address-icon svg {
-            width: 24px;
-            height: 24px;
-            stroke: #de002b;
-            stroke-width: 1.8;
-            fill: none;
-        }
-        
-        .address-text {
-            flex: 1;
-            line-height: 1.3;
-        }
-        
-        .address-item.selected .address-icon svg {
-            stroke: #de002b;
-            fill: rgba(222, 0, 43, 0.1);
-        }
+      .option-card {
+        border-radius: 16px;
+        padding: 16px 18px;
+        border: 1px solid #e8e8e8;
+        transition: all 0.2s;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
 
-        /* Стиль кнопки "назад" со стрелкой */
-        .small-btn {
-            flex: 1;
-            background: #f0f0f0;
-            padding: 12px;
-            border-radius: 44px;
-            text-align: center;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            color: #000000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: background 0.2s;
-        }
-        
-        .small-btn:hover {
-            background: #e4e4e4;
-        }
-        
-        .btn-icon {
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .btn-icon svg {
-            width: 18px;
-            height: 18px;
-            stroke: #000000;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            fill: none;
-        }
+      .option-card.selected {
+        background: #fff0f2;
+        border-color: #de002b;
+        border-left: 4px solid #de002b;
+      }
 
-        /* Дни недели */
-        .weekdays {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 14px;
-            margin-bottom: 20px;
-        }
+      .option-info {
+        flex: 1;
+      }
 
-        .day-btn {
-            background: #f0f0f0;
-            padding: 10px 20px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            color: #000000;
-        }
+      .option-img {
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+      }
 
-        .day-btn.selected-day {
-            background: #de002b;
-            color: white;
-        }
+      .option-title {
+        font-weight: 700;
+        font-size: 1.05rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+        color: #de002b;
+      }
 
-        .time-slots {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 28px;
-        }
+      .option-desc {
+        font-size: 0.8rem;
+        color: #777777;
+      }
 
-        .time-slot {
-            background: #f0f0f0;
-            padding: 12px 20px;
-            border-radius: 40px;
-            font-weight: 500;
-            font-size: 0.9rem;
-            cursor: pointer;
-            color: #000000;
-        }
+      .price-badge {
+        background: white;
+        padding: 4px 12px;
+        border-radius: 40px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #de002b;
+        border: 1px solid #ffccd4;
+        display: inline-block;
+        margin-top: 6px;
+      }
 
-        .time-slot.selected-time {
-            background: #de002b;
-            color: white;
-        }
+      /* Адреса */
+      .address-item {
+        height: 120px;
+        border-radius: 16px;
+        padding: 16px 18px;
+        border: 1px solid #e8e8e8;
+        transition: all 0.2s;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: #000000;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
 
-        .total-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 18px 0;
-            border-top: 1px solid #e8e8e8;
-            border-bottom: 1px solid #e8e8e8;
-            font-weight: 800;
-            font-size: 1.5rem;
-            margin: 8px 0 24px;
-            color: #000000;
-        }
+      .address-item.selected {
+        background: #fff0f2;
+        border-color: #de002b;
+        border-left: 4px solid #de002b;
+      }
 
-        /* Кнопки */
-        .btn {
-            background: #000000;
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 16px 24px;
-            font-weight: 700;
-            font-size: 1rem;
-            width: 100%;
-            cursor: pointer;
-            text-align: center;
-        }
+      .address-icon {
+        width: 28px;
+        height: 28px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-        .btn-primary {
-            background: #de002b;
-        }
+      .address-icon svg {
+        width: 24px;
+        height: 24px;
+        stroke: #de002b;
+        stroke-width: 1.8;
+        fill: none;
+      }
 
-        .btn-outline {
-            background: transparent;
-            border: 1.5px solid #dddddd;
-            color: #000000;
-            margin-top: 12px;
-        }
+      .address-text {
+        flex: 1;
+        line-height: 1.3;
+      }
 
-        .nav-buttons {
-            display: flex;
-            gap: 12px;
-            margin-top: 8px;
-            width: 100%;
-        }
+      /* Кнопки */
+      .btn {
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 16px 24px;
+        font-weight: 700;
+        font-size: 1rem;
+        width: 100%;
+        cursor: pointer;
+        text-align: center;
+        transition: opacity 0.2s;
+      }
 
-        /* Детали подтверждения */
-        .detail-group {
-            background: #fafafa;
-            border-radius: 20px;
-            padding: 18px;
-            margin-bottom: 20px;
-            border: 1px solid #eeeeee;
-            width: 100%;
-        }
+      .btn-primary {
+        background: #de002b;
+      }
 
-        .detail-row {
-            margin-bottom: 14px;
-        }
+      .btn-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
 
-        .detail-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            color: #999999;
-            font-weight: 500;
-        }
+      .btn-outline {
+        background: transparent;
+        border: 1.5px solid #dddddd;
+        color: #000000;
+        margin-top: 12px;
+      }
 
-        .detail-value {
-            font-weight: 600;
-            font-size: 1rem;
-            margin-top: 4px;
-            color: #000000;
-        }
+      .nav-buttons {
+        display: flex;
+        gap: 12px;
+        margin: 16px 0 8px;
+        width: 100%;
+      }
 
-        .confirm-card {
-            background: #fff0f2;
-            border-radius: 20px;
-            padding: 18px;
-            margin: 12px 0;
-            border: 1px solid #ffd9df;
-            width: 100%;
-        }
+      .small-btn {
+        flex: 1;
+        background: #f0f0f0;
+        padding: 12px;
+        border-radius: 44px;
+        text-align: center;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        color: #000000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: background 0.2s;
+      }
 
-        .extra-buttons {
-            display: flex;
-            gap: 12px;
-            margin: 16px 0 8px;
-            width: 100%;
-        }
+      .btn-icon svg {
+        width: 18px;
+        height: 18px;
+        stroke: #000000;
+        stroke-width: 2;
+      }
 
-        .extra-btn {
-            background: #f0f0f0;
-            padding: 10px;
-            border-radius: 44px;
-            text-align: center;
-            font-size: 0.8rem;
-            font-weight: 500;
-            flex: 1;
-            cursor: pointer;
-            color: #000000;
-        }
+      /* Дни недели */
+      .weekdays {
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        padding-bottom: 14px;
+        margin-bottom: 24px;
+        width: 100%;
+        justify-content: space-between;
+      }
 
-        .footer-note {
-            font-size: 0.7rem;
-            color: #999999;
-            text-align: center;
-            margin-top: 18px;
-        }
+      .day-btn {
+        flex: 1;
+        background: #ffffff;
+        padding: 12px 8px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        color: #000000;
+        text-align: center;
+        border: 1px solid #e8e8e8;
+        transition: all 0.2s;
+      }
 
-        /* Калькулятор */
-        .calculator-wrap {
-            margin: 16px 0 8px;
-            border-radius: 20px;
-            border: 1px solid #e8e8e8;
-            overflow: hidden;
-            background: white;
-            width: 100%;
-        }
+      .day-btn span {
+        display: block;
+        font-size: 0.7rem;
+        color: #999;
+        margin-top: 4px;
+      }
 
-        .calc-header {
-            background: #de002b;
-            padding: 14px 18px;
-        }
+      .day-btn.selected-day {
+        background: #de002b;
+        color: white;
+        border-color: #de002b;
+      }
 
-        .calc-header h3 {
-            color: white;
-            font-size: 1rem;
-            font-weight: 700;
-            margin: 0;
-        }
+      .day-btn.selected-day span {
+        color: rgba(255, 255, 255, 0.8);
+      }
 
-        .calc-body {
-            padding: 16px;
-        }
+      /* Сетка времени */
+      .time-slots {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 28px;
+        width: 100%;
+      }
 
-        .field-group {
-            margin-bottom: 14px;
-        }
+      .time-slot {
+        background: #f5f5f5;
+        padding: 12px 8px;
+        border-radius: 12px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        cursor: pointer;
+        color: #000000;
+        text-align: center;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+      }
 
-        .field-group label {
-            font-weight: 700;
-            font-size: 13px;
-            color: #de002b;
-            margin-bottom: 6px;
-            display: block;
-        }
+      .time-slot.selected-time {
+        background: #de002b;
+        color: white;
+        border-color: #de002b;
+      }
 
-        .calc-select {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid #e0e0e0;
-            border-radius: 28px;
-            background: white;
-            font-family: inherit;
-            font-size: 14px;
-            cursor: pointer;
-            color: #000000;
-        }
+      .total-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 18px 0;
+        border-top: 1px solid #e8e8e8;
+        border-bottom: 1px solid #e8e8e8;
+        font-weight: 800;
+        font-size: 1.3rem;
+        margin: 8px 0 20px;
+        color: #de002b;
+        width: 100%;
+      }
 
-        .discount-check {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 14px 0;
-        }
+      /* Форма контактных данных */
+      .form-group {
+        margin-bottom: 20px;
+        width: 100%;
+      }
 
-        .discount-check label {
-            color: #000000;
-        }
+      .form-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #000;
+        margin-bottom: 8px;
+        display: block;
+      }
 
-        .discount-check input {
-            width: 18px;
-            height: 18px;
-            accent-color: #de002b;
-        }
+      .form-label span {
+        color: #de002b;
+      }
 
-        .calc-button, .reset-calc-btn {
-            width: 100%;
-            padding: 12px;
-            border-radius: 40px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-bottom: 10px;
-            border: none;
-        }
+      .form-input {
+        width: 100%;
+        padding: 14px 16px;
+        font-size: 1rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 16px;
+        font-family: inherit;
+        transition: all 0.2s;
+      }
 
-        .calc-button {
-            background: #de002b;
-            color: white;
-        }
+      .form-input:focus {
+        outline: none;
+        border-color: #de002b;
+        box-shadow: 0 0 0 3px rgba(222, 0, 43, 0.1);
+      }
 
-        .reset-calc-btn {
-            background: #f0f0f0;
-            color: #000000;
-            border: 1px solid #dddddd;
-        }
+      .form-input::placeholder {
+        color: #bbb;
+      }
 
-        .price-result {
-            background: #fafafa;
-            border-radius: 16px;
-            padding: 14px;
-            margin-top: 14px;
-            border-left: 4px solid #de002b;
-        }
+      textarea.form-input {
+        resize: vertical;
+        min-height: 80px;
+      }
 
-        .final-price {
-            font-size: 26px;
-            font-weight: 800;
-            color: #de002b;
-        }
+      .error-message {
+        font-size: 0.75rem;
+        color: #de002b;
+        margin-top: 6px;
+        display: none;
+      }
 
-        .service-detail {
-            font-size: 11px;
-            color: #999999;
-            margin-top: 6px;
-        }
+      .error-message.show {
+        display: block;
+      }
 
-        .hidden-result {
-            display: none;
-        }
+      .input-error {
+        border-color: #de002b !important;
+        background: #fff0f2;
+      }
 
-        .additional-services {
-            margin-top: 16px;
-            padding-top: 12px;
-            border-top: 1px solid #e8e8e8;
-        }
+      /* Инфо-бокс с датой и адресом */
+      .info-box {
+        background: #f8f8f8;
+        border-radius: 16px;
+        padding: 16px;
+        margin: 16px 0;
+        width: 100%;
+      }
 
-        .services-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
+      .info-box p {
+        margin: 6px 0;
+        font-size: 0.9rem;
+        color: #333;
+      }
 
-        .service-check, .radio-option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-            padding: 6px 0;
-            color: #000000;
-        }
+      .info-box strong {
+        color: #de002b;
+      }
 
-        .service-price {
-            color: #de002b;
-            font-weight: 600;
-            margin-left: auto;
-        }
+      .info-box .service-line {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid #e0e0e0;
+      }
 
-        .grand-total {
-            background: #fff0f2;
-            border-radius: 16px;
-            padding: 12px;
-            display: flex;
-            justify-content: space-between;
-            font-weight: 800;
-            margin-top: 12px;
-            color: #000000;
-        }
+      /* Подтверждение */
+      .confirm-card {
+        background: #ffffff;
+        border-radius: 20px;
+        width: 100%;
+        margin-bottom: 20px;
+      }
 
-        .radio-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
+      .confirm-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 16px 0;
+        border-bottom: 1px solid #f0f0f0;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
 
-        .phone-mock {
-            background: #f5f5f5;
-            border-radius: 40px;
-            padding: 10px;
-            text-align: center;
-            margin-top: 12px;
-            font-size: 14px;
-            color: #000000;
-        }
+      .confirm-item:hover {
+        background: #fafafa;
+      }
 
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .auto-next-hint {
-            font-size: 0.7rem;
-            color: #de002b;
-            text-align: center;
-            margin-top: -16px;
-            margin-bottom: 12px;
-        }
+      .confirm-item:last-child {
+        border-bottom: none;
+      }
+
+      .confirm-label {
+        font-size: 0.85rem;
+        color: #999;
+        font-weight: 500;
+        min-width: 100px;
+      }
+
+      .confirm-value {
+        font-size: 0.95rem;
+        color: #000;
+        font-weight: 500;
+        text-align: right;
+        flex: 1;
+      }
+
+      .price-large {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #de002b;
+      }
+
+      .edit-icon {
+        font-size: 0.7rem;
+        color: #de002b;
+        margin-left: 8px;
+      }
+
+      /* Успешная запись */
+      .success-card {
+        background: #ffffff;
+        border-radius: 24px;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 24px;
+      }
+
+      .success-icon {
+        font-size: 64px;
+        margin-bottom: 16px;
+      }
+
+      .success-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #de002b;
+        margin-bottom: 20px;
+      }
+
+      .success-datetime {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #000;
+        margin-bottom: 8px;
+      }
+
+      .success-address {
+        font-size: 1rem;
+        color: #666;
+        margin-bottom: 24px;
+      }
+
+      .success-message {
+        font-size: 0.85rem;
+        color: #888;
+        margin-bottom: 28px;
+        padding-top: 16px;
+        border-top: 1px solid #f0f0f0;
+      }
+
+      .success-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+      }
+
+      .success-btn {
+        flex: 1;
+        background: #f5f5f5;
+        padding: 14px;
+        border-radius: 50px;
+        text-align: center;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        color: #000;
+        border: none;
+      }
+
+      .success-btn-primary {
+        background: #de002b;
+        color: white;
+      }
+
+      .hidden-result {
+        display: none !important;
+      }
     </style>
-</head>
-<body>
-<div class="app-container">
-    <!-- ЭКРАН 1: Выбор услуги -->
-    <div id="screen1" class="screen active">
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- ЭКРАН 1: Выбор услуги -->
+      <div id="screen1" class="screen active">
         <h1 style="color: #de002b">Запись на услугу</h1>
         <div class="subhead-center">Выберите услугу</div>
         <div class="options-grid" id="servicesContainer"></div>
-    </div>
+      </div>
 
-    <!-- ЭКРАН 2: Выбор сервиса (адреса) -->
-    <div id="screen2" class="screen">
-        <h2 style="color: #de002b;">Выбор сервиса</h2>
+      <!-- ЭКРАН 2: Выбор сервиса (адреса) -->
+      <div id="screen2" class="screen">
+        <h2 style="color: #de002b">Выбор сервиса</h2>
         <div class="subhead">Где вам удобно? Нажмите на адрес</div>
-           <div class="nav-buttons">
-            <div style="display: flex;"  id="backToScreen1Btn">
-                <span class="btn-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M16 4L8 12L16 20" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </span>
-                <span>назад</span>
-            </div>
+        <div class="nav-buttons">
+          <div id="backToScreen1Btn">
+            <span class="btn-icon"
+              ><svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M16 4L8 12L16 20" stroke="black" stroke-width="2" /></svg
+            ></span>
+            <span>Назад</span>
+          </div>
         </div>
         <div class="address-list" id="locationsContainer"></div>
-     
-    </div>
+      </div>
 
-    <!-- ЭКРАН 3: Дата и время + Калькулятор -->
-    <div id="screen3" class="screen">
-        <h2>📅 Дата и время</h2>
+      <!-- ЭКРАН 3: КАЛЬКУЛЯТОР -->
+      <div id="screen3" class="screen">
+        <div style="width: 100%" id="calculatorContainer"></div>
+        <div class="total-row">
+          <span>Итого:</span>
+          <span id="totalPriceSpan">0 ₽</span>
+        </div>
+        <div class="nav-buttons">
+          <div class="btn" style="color: #de002b" id="backToScreen2FromCalc">← Назад</div>
+          <button id="toScreen4Btn" class="btn btn-primary" disabled>Продолжить →</button>
+        </div>
+      </div>
+
+      <!-- ЭКРАН 4: ДАТА И ВРЕМЯ -->
+      <div id="screen4" class="screen">
+        <h2 style="color: #000">Дата и время</h2>
         <div class="subhead">Выберите удобное время</div>
         <div class="weekdays" id="weekdaysContainer"></div>
         <div class="time-slots" id="timesContainer"></div>
-        
-        <!-- Калькулятор -->
-        <div class="calculator-wrap">
-            <div class="calc-header"><h3>💰 Калькулятор стоимости шиномонтажа</h3></div>
-            <div class="calc-body">
-                <div class="field-group">
-                    <label>Тип автомобиля</label>
-                    <select id="carType" class="calc-select">
-                        <option value="sedan">Легковой автомобиль</option>
-                        <option value="crossover">Кроссовер / Минивэн</option>
-                        <option value="suv">Внедорожник (SUV)</option>
-                    </select>
-                </div>
-                <div class="field-group">
-                    <label>Диаметр колеса (дюймы)</label>
-                    <select id="wheelDiameter" class="calc-select"></select>
-                </div>
-                <div class="field-group">
-                    <label>Выберите услугу</label>
-                    <select id="serviceTypeCalc" class="calc-select">
-                        <option value="complex_set">Комплекс шиномонтажа (комплект)</option>
-                        <option value="complex_single">Комплекс шиномонтажа (1 колесо)</option>
-                        <option value="mount_set">Снятие и установка (комплект)</option>
-                        <option value="mount_single">Снятие и установка (1 колесо)</option>
-                        <option value="balancing_set">Балансировка (комплект)</option>
-                        <option value="balancing_single">Балансировка (1 колесо)</option>
-                    </select>
-                </div>
-                <div class="discount-check">
-                    <input type="checkbox" id="discountCard">
-                    <label for="discountCard">Дисконтная карта (скидка 15%)</label>
-                </div>
-                <button class="calc-button" id="calcBtn">Рассчитать стоимость</button>
-                <button class="reset-calc-btn" id="resetCalcBtn">Сбросить</button>
-                
-                <div id="priceResultBlock" class="price-result hidden-result">
-                    <div class="final-price" id="finalPriceDisplay">0 ₽</div>
-                    <div id="discountInfo" style="font-size: 11px; color: #de002b;"></div>
-                    <div id="serviceDetail" class="service-detail"></div>
-                </div>
-                
-                <div id="additionalBlock" style="display: none;">
-                    <div class="additional-services">
-                        <div class="services-grid" id="additionalChecklist"></div>
-                        <div class="grand-total">
-                            <span>Итого с доп. услугами:</span>
-                            <span id="grandTotalDisplay">0 ₽</span>
-                        </div>
-                    </div>
-                </div>
-                <div style="font-size: 9px; color: #aaa; margin-top: 12px; text-align: center;">* AT/MT/RunFlat шины, низкий профиль, ремонт, TPMS</div>
-            </div>
-        </div>
-        
-        <div class="total-row">
-            <span>Итого:</span>
-            <span id="totalPriceSpan">0 ₽</span>
-        </div>
         <div class="nav-buttons">
-            <div class="small-btn" id="backToScreen2Btn">← Назад</div>
-            <button id="toScreen4Btn" class="btn btn-primary">Записаться →</button>
+          <div class="btn" style="color: #de002b" id="backToScreen3FromDateTime">← Назад</div>
+          <button id="toFormBtn" class="btn btn-primary" disabled>Продолжить →</button>
         </div>
-    </div>
+      </div>
 
-    <!-- ЭКРАН 4: Подтверждение -->
-    <div id="screen4" class="screen">
-        <h2>✅ Подтверждение</h2>
-        <div class="subhead">Проверьте детали записи</div>
-        <div class="detail-group" id="confirmDetails"></div>
-        <div class="extra-buttons">
-            <div class="extra-btn" id="addToCalendarBtn">📅 Добавить к календарю</div>
-            <div class="extra-btn" id="menuBookingBtn">📋 Перейти в меню</div>
+      <!-- ЭКРАН 5: ФОРМА КОНТАКТНЫХ ДАННЫХ -->
+      <div id="screen5" class="screen">
+        <h2 style="color: #000">Контактные данные</h2>
+        <div class="subhead">Заполните информацию о себе</div>
+
+        <div class="timer-container">
+          <div class="timer-text">Время до завершения бронирования</div>
+          <div class="timer" id="countdownTimer">05:00</div>
         </div>
+
+        <div class="info-box" id="bookingInfoPreview"></div>
+
+        <div class="form-group">
+          <label class="form-label">Контактный телефон <span>*</span></label>
+          <input
+            type="tel"
+            id="phoneInput"
+            class="form-input"
+            placeholder="+7 (___) ___-__-__"
+            value="+7"
+            inputmode="numeric"
+          />
+          <div class="error-message" id="phoneError">
+            Введите корректный номер телефона (10 цифр)
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Фамилия <span>*</span></label>
+          <input type="text" id="lastNameInput" class="form-input" placeholder="Введите фамилию" />
+          <div class="error-message" id="lastNameError">Введите фамилию</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Имя <span>*</span></label>
+          <input type="text" id="firstNameInput" class="form-input" placeholder="Введите имя" />
+          <div class="error-message" id="firstNameError">Введите имя</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Электронная почта</label>
+          <input
+            type="email"
+            id="emailInput"
+            class="form-input"
+            placeholder="email@example.com"
+            inputmode="email"
+          />
+          <div class="error-message" id="emailError">Введите корректный email</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Комментарий</label>
+          <textarea
+            id="commentInput"
+            class="form-input"
+            placeholder="Дополнительная информация..."
+          ></textarea>
+        </div>
+
         <div class="nav-buttons">
-            <div class="small-btn" id="backToScreen3Btn">← Редактировать</div>
-            <button id="toScreen5Btn" class="btn btn-primary">Подтвердить запись</button>
+          <div class="btn" style="color: #de002b" id="backToScreen4FromForm">← Назад</div>
+          <button id="toConfirmFromForm" class="btn btn-primary" disabled>Далее →</button>
         </div>
+      </div>
+
+      <!-- ЭКРАН 6: Подтверждение деталей -->
+      <div id="screen6" class="screen">
+        <h2 style="color: #000">Подтверждение</h2>
+        <div class="subhead">Нажмите на блок для редактирования</div>
+        <div class="confirm-card" id="confirmDetails"></div>
+        <div class="nav-buttons">
+          <div class="btn" style="color: #de002b" id="backToScreen5FromConfirm">← Назад</div>
+          <button id="toScreen7Btn" class="btn btn-primary">Подтвердить</button>
+        </div>
+      </div>
+
+      <!-- ЭКРАН 7: Запись подтверждена -->
+      <div id="screen7" class="screen">
+        <div class="success-card">
+          <div class="success-title">Запись подтверждена!</div>
+          <div class="success-icon">✅</div>
+          <div class="success-datetime">Ваша запись</div>
+          <div class="success-datetime" id="successDateTime"></div>
+          <div class="success-address" id="successAddress"></div>
+          <div class="success-message">Мы отправим подтверждение в SMS и уведомление</div>
+        </div>
+        <div class="success-buttons">
+          <button class="success-btn" id="addToCalendarFinalBtn">Добавить в календарь</button>
+          <button class="success-btn success-btn-primary" id="myBookingsBtn">
+            Перейти в мои записи
+          </button>
+        </div>
+        <button id="newBookingFinalBtn" class="btn btn-outline" style="margin-top: 16px">
+          Новая запись
+        </button>
+      </div>
     </div>
 
-    <!-- ЭКРАН 5: Запись подтверждена -->
-    <div id="screen5" class="screen">
-        <h2>🎉 Запись подтверждена!</h2>
-        <div class="confirm-card" id="successInfo"></div>
-        <div class="detail-group" id="extraInfo"></div>
-        <button id="newBookingBtn" class="btn btn-outline">➕ Новая запись</button>
-        <div class="footer-note">25 мин. включительно • Действительная автовыемкость</div>
-    </div>
-</div>
+    <script>
+      // ---------- ДАННЫЕ ----------
+      const servicesList = [
+        {
+          id: 1,
+          name: 'Шиномонтаж',
+          desc: 'Монтаж и балансировка колёс',
+          price: 2400,
+          img: 'https://perfectselect.ru/upload/iblock/37d/37da6412e5ef9bc156088435e70f3c4b.jpg',
+        },
+        {
+          id: 2,
+          name: 'Автосервис самообслуживания',
+          desc: 'Кухонная техника от 600 ₽/час',
+          price: 600,
+          img: 'https://bigteh.ru/wa-data/public/blog/data/mainpic/post-306-original.jpg',
+        },
+        {
+          id: 3,
+          name: 'Замена аккумулятора',
+          desc: 'Подбор и замена АКБ от 1500 ₽',
+          price: 1500,
+          img: 'https://bigteh.ru/wa-data/public/blog/data/mainpic/post-306-original.jpg',
+        },
+        {
+          id: 4,
+          name: 'Диагностика автомобиля',
+          desc: 'Компьютерная диагностика от 1000 ₽',
+          price: 1000,
+          img: 'https://bigteh.ru/wa-data/public/blog/data/mainpic/post-306-original.jpg',
+        },
+      ];
 
-<script>
-    // Данные
-    const servicesList = [
-        { id: 1, name: 'Шиномонтаж', desc: 'Монтаж и балансировка колёс', price: 2400, img: 'https://perfectselect.ru/upload/iblock/37d/37da6412e5ef9bc156088435e70f3c4b.jpg' },
-        { id: 2, name: 'Автосервис самообслуживания', desc: 'Кухонная техника от 600 ₽/час', price: 600, img: 'https://bigteh.ru/wa-data/public/blog/data/mainpic/post-306-original.jpg' },
-        { id: 3, name: 'Замена аккумулятора', desc: 'Подбор и замена АКБ от 1500 ₽', price: 1500, img: 'https://bigteh.ru/wa-data/public/blog/data/mainpic/post-306-original.jpg' },
-        { id: 4, name: 'Диагностика автомобиля', desc: 'Компьютерная диагностика от 1000 ₽', price: 1000, img: 'https://bigteh.ru/wa-data/public/blog/data/mainpic/post-306-original.jpg' }
-    ];
-    
-    const locationsList = [
+      const locationsList = [
         { id: 1, address: 'Шиномонтаж на Можайском ш., Межпосадное ш., 185' },
         { id: 2, address: 'Шиномонтаж на Кутузовском, Кутузовский пр.-т, 68' },
         { id: 3, address: 'Шиномонтаж на Ленинском, Ленинский пр.-т, 123' },
-        { id: 4, address: 'Шиномонтаж на Варшавском, Варшавское ш., 99' }
-    ];
-    
-    const weekdays = ['Ср', 'Пн', 'Чт', 'Пт', 'Сб', 'Вс'];
-    const weekdaysFull = ['Среда', 'Понедельник', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
-    const timeSlots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '18:00', '19:00', '20:00'];
-    
-    // Состояние
-    let selectedService = null;
-    let selectedLocation = null;
-    let selectedDayIndex = 0;
-    let selectedTime = '11:00';
-    let calcTotal = 2400;
-    let calcData = { finalPrice: 2400, carType: 'sedan', diameter: 16, serviceName: 'Комплекс шиномонтажа (комплект)', discountAmount: 0, additionalSum: 0 };
-    
-    // Иконка SVG (гео-метка)
-    const locationIconSvg = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M6.0325 15.2873L12.0001 22L17.9677 15.2873C22.5447 10.1388 18.8894 2 12.0001 2C5.11079 2 1.45549 10.1388 6.0325 15.2873Z" stroke="#DE002B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="12" cy="10" r="3" stroke="#DE002B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>`;
-    
-    // Цены для калькулятора
-    const basePrices = {
-        sedan: { 
-            13: { complex_set: 1960, complex_single: 490, mount_set: 660, mount_single: 165, balancing_set: 560, balancing_single: 140 },
-            14: { complex_set: 2060, complex_single: 515, mount_set: 680, mount_single: 170, balancing_set: 590, balancing_single: 148 },
-            15: { complex_set: 2160, complex_single: 540, mount_set: 710, mount_single: 178, balancing_set: 620, balancing_single: 155 },
-            16: { complex_set: 2260, complex_single: 565, mount_set: 760, mount_single: 190, balancing_set: 660, balancing_single: 165 },
-            17: { complex_set: 2520, complex_single: 630, mount_set: 840, mount_single: 210, balancing_set: 710, balancing_single: 178 },
-            18: { complex_set: 2760, complex_single: 690, mount_set: 920, mount_single: 230, balancing_set: 780, balancing_single: 195 },
-            19: { complex_set: 3200, complex_single: 800, mount_set: 1060, mount_single: 265, balancing_set: 860, balancing_single: 215 },
-            20: { complex_set: 3500, complex_single: 875, mount_set: 1150, mount_single: 288, balancing_set: 920, balancing_single: 230 }
-        },
-        crossover: { 
-            13: { complex_set: 2260, complex_single: 565, mount_set: 770, mount_single: 193, balancing_set: 680, balancing_single: 170 },
-            14: { complex_set: 2360, complex_single: 590, mount_set: 800, mount_single: 200, balancing_set: 710, balancing_single: 178 },
-            15: { complex_set: 2500, complex_single: 625, mount_set: 840, mount_single: 210, balancing_set: 740, balancing_single: 185 },
-            16: { complex_set: 2660, complex_single: 665, mount_set: 900, mount_single: 225, balancing_set: 780, balancing_single: 195 },
-            17: { complex_set: 2940, complex_single: 735, mount_set: 980, mount_single: 245, balancing_set: 820, balancing_single: 205 },
-            18: { complex_set: 3200, complex_single: 800, mount_set: 1060, mount_single: 265, balancing_set: 860, balancing_single: 215 },
-            19: { complex_set: 3400, complex_single: 850, mount_set: 1140, mount_single: 285, balancing_set: 910, balancing_single: 228 },
-            20: { complex_set: 3600, complex_single: 900, mount_set: 1220, mount_single: 305, balancing_set: 970, balancing_single: 243 }
-        },
-        suv: { 
-            13: { complex_set: 2540, complex_single: 635, mount_set: 860, mount_single: 215, balancing_set: 760, balancing_single: 190 },
-            14: { complex_set: 2640, complex_single: 660, mount_set: 890, mount_single: 223, balancing_set: 790, balancing_single: 198 },
-            15: { complex_set: 2780, complex_single: 695, mount_set: 930, mount_single: 233, balancing_set: 820, balancing_single: 205 },
-            16: { complex_set: 2940, complex_single: 735, mount_set: 980, mount_single: 245, balancing_set: 860, balancing_single: 215 },
-            17: { complex_set: 3240, complex_single: 810, mount_set: 1060, mount_single: 265, balancing_set: 900, balancing_single: 225 },
-            18: { complex_set: 3520, complex_single: 880, mount_set: 1160, mount_single: 290, balancing_set: 950, balancing_single: 238 },
-            19: { complex_set: 3740, complex_single: 935, mount_set: 1240, mount_single: 310, balancing_set: 1000, balancing_single: 250 },
-            20: { complex_set: 3960, complex_single: 990, mount_set: 1320, mount_single: 330, balancing_set: 1060, balancing_single: 265 }
+        { id: 4, address: 'Шиномонтаж на Варшавском, Варшавское ш., 99' },
+      ];
+
+      const weekdaysData = [
+        { name: 'Ср', date: '20 мая', full: 'Среда', dayNum: 20 },
+        { name: 'Чт', date: '21 мая', full: 'Четверг', dayNum: 21 },
+        { name: 'Пн', date: '22 мая', full: 'Понедельник', dayNum: 22 },
+        { name: 'Вс', date: '23 мая', full: 'Воскресенье', dayNum: 23 },
+        { name: 'Сб', date: '24 мая', full: 'Суббота', dayNum: 24 },
+        { name: 'Вс', date: '25 мая', full: 'Воскресенье', dayNum: 25 },
+      ];
+
+      const timeSlots = [
+        '09:00',
+        '10:00',
+        '11:00',
+        '12:00',
+        '13:00',
+        '14:00',
+        '15:00',
+        '16:00',
+        '17:00',
+        '18:00',
+        '19:00',
+        '20:00',
+      ];
+
+      let selectedService = null;
+      let selectedLocation = null;
+      let selectedDayIndex = 0;
+      let selectedTime = '11:00';
+      let currentTotalPrice = 0;
+      let currentCalcParams = {
+        carType: 'Легковой автомобиль',
+        diameter: '16',
+        serviceName: 'Комплекс шиномонтажа (комплект)',
+      };
+
+      let formData = {
+        phone: '+7',
+        lastName: '',
+        firstName: '',
+        email: '',
+        comment: '',
+      };
+
+      let countdownInterval = null;
+      let timeLeft = 300;
+
+      function startCountdown() {
+        if (countdownInterval) clearInterval(countdownInterval);
+        timeLeft = 300;
+        updateTimerDisplay();
+        countdownInterval = setInterval(() => {
+          if (timeLeft <= 0) {
+            clearInterval(countdownInterval);
+            alert('Время бронирования истекло. Пожалуйста, начните запись заново.');
+            resetToStart();
+          } else {
+            timeLeft--;
+            updateTimerDisplay();
+          }
+        }, 1000);
+      }
+
+      function updateTimerDisplay() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        const timerElement = document.getElementById('countdownTimer');
+        if (timerElement) {
+          timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+          if (timeLeft <= 60) {
+            timerElement.style.color = '#ff4444';
+          }
         }
-    };
-    
-    function getBasePrice(carType, diameter, serviceKey) {
-        try { return basePrices[carType]?.[diameter]?.[serviceKey] || 2000; } catch(e) { return 2000; }
-    }
-    
-    function updateCalculator() {
-        let carType = document.getElementById('carType').value;
-        let diameter = parseInt(document.getElementById('wheelDiameter').value);
-        let serviceKey = document.getElementById('serviceTypeCalc').value;
-        let serviceName = document.getElementById('serviceTypeCalc').options[document.getElementById('serviceTypeCalc').selectedIndex]?.text || '';
-        let hasDiscount = document.getElementById('discountCard').checked;
-        let base = getBasePrice(carType, diameter, serviceKey);
-        let discount = hasDiscount ? Math.round(base * 0.15) : 0;
-        let finalBase = base - discount;
-        
-        let additional = 0;
-        let isSet = serviceKey.includes('_set');
-        let multiplier = isSet ? 4 : 1;
-        
-        let tireRadio = document.querySelector('input[name="tireType"]:checked');
-        if (tireRadio) additional += parseInt(tireRadio.value) * multiplier;
-        if (document.getElementById('lowProfile')?.checked) additional += 100 * multiplier;
-        if (document.getElementById('valve')?.checked) additional += 75;
-        if (document.getElementById('repair')?.checked) additional += 250;
-        if (document.getElementById('tpms')?.checked) additional += 1000;
-        
-        let total = finalBase + additional;
-        calcTotal = total;
-        calcData = { finalPrice: total, carType, diameter, serviceName, discountAmount: discount, additionalSum: additional };
-        
-        document.getElementById('priceResultBlock').classList.remove('hidden-result');
-        document.getElementById('finalPriceDisplay').innerHTML = total.toLocaleString('ru-RU') + ' ₽';
-        document.getElementById('discountInfo').innerHTML = hasDiscount && discount > 0 ? `Скидка 15%: -${discount} ₽` : '';
-        let carTypeName = carType === 'sedan' ? 'Легковой' : (carType === 'crossover' ? 'Кроссовер' : 'Внедорожник');
-        document.getElementById('serviceDetail').innerHTML = `${carTypeName} • ${diameter}″ • ${serviceName}`;
-        document.getElementById('grandTotalDisplay').innerHTML = total.toLocaleString('ru-RU') + ' ₽';
-        document.getElementById('totalPriceSpan').innerHTML = total.toLocaleString('ru-RU') + ' ₽';
-        document.getElementById('additionalBlock').style.display = 'block';
-    }
-    
-    function buildAdditionalHTML() {
-        let multElem = document.getElementById('serviceTypeCalc');
-        let mult = (multElem && multElem.value.includes('_set')) ? 4 : 1;
-        return `
-            <div style="margin-bottom: 8px; font-weight: 700;">Типы шин (доплата)</div>
-            <div class="radio-option"><input type="radio" name="tireType" value="100"><label>Шины AT</label><span class="service-price">${100*mult} ₽</span></div>
-            <div class="radio-option"><input type="radio" name="tireType" value="150"><label>Шины MT</label><span class="service-price">${150*mult} ₽</span></div>
-            <div class="radio-option"><input type="radio" name="tireType" value="150"><label>Run Flat</label><span class="service-price">${150*mult} ₽</span></div>
-            <div class="service-check"><input type="checkbox" id="lowProfile"><label>Низкий профиль (&lt;45)</label><span class="service-price">${100*mult} ₽</span></div>
-            <div class="service-check"><input type="checkbox" id="valve"><label>Установка вентиля</label><span class="service-price">75 ₽</span></div>
-            <div class="service-check"><input type="checkbox" id="repair"><label>Ремонт покрышки</label><span class="service-price">250 ₽</span></div>
-            <div class="service-check"><input type="checkbox" id="tpms"><label>TPMS программирование</label><span class="service-price">1000 ₽</span></div>
-        `;
-    }
-    
-    function refreshAdditionalOnServiceChange() {
-        let checklist = document.getElementById('additionalChecklist');
-        if (checklist) {
-            checklist.innerHTML = buildAdditionalHTML();
+      }
+
+      function resetToStart() {
+        if (countdownInterval) clearInterval(countdownInterval);
+        selectedService = null;
+        selectedLocation = null;
+        selectedDayIndex = 0;
+        selectedTime = '11:00';
+        currentTotalPrice = 0;
+        formData = { phone: '+7', lastName: '', firstName: '', email: '', comment: '' };
+        showScreen(1);
+      }
+
+      function showScreen(num) {
+        for (let i = 1; i <= 7; i++) {
+          const el = document.getElementById(`screen${i}`);
+          if (el) el.classList.remove('active');
         }
-        updateCalculator();
-    }
-    
-    function initCalculator() {
-        let diamSelect = document.getElementById('wheelDiameter');
-        if (diamSelect.children.length === 0) {
-            for (let i = 13; i <= 20; i++) {
-                let opt = document.createElement('option');
-                opt.value = i;
-                opt.textContent = i + '"';
-                if (i === 16) opt.selected = true;
-                diamSelect.appendChild(opt);
-            }
+        const target = document.getElementById(`screen${num}`);
+        if (target) target.classList.add('active');
+
+        if (num === 1) renderScreen1();
+        if (num === 2) renderScreen2();
+        if (num === 3) {
+          // Обновляем состояние кнопки в калькуляторе
+          const toScreen4Btn = document.getElementById('toScreen4Btn');
+          if (toScreen4Btn) toScreen4Btn.disabled = currentTotalPrice === 0;
         }
-        refreshAdditionalOnServiceChange();
-        
-        document.getElementById('calcBtn').onclick = () => updateCalculator();
-        document.getElementById('resetCalcBtn').onclick = () => {
-            document.getElementById('carType').value = 'sedan';
-            document.getElementById('wheelDiameter').value = '16';
-            document.getElementById('serviceTypeCalc').selectedIndex = 0;
-            document.getElementById('discountCard').checked = false;
-            document.querySelectorAll('#additionalBlock input').forEach(i => { if (i.type === 'checkbox' || i.type === 'radio') i.checked = false; });
-            refreshAdditionalOnServiceChange();
-            updateCalculator();
-        };
-        document.getElementById('serviceTypeCalc').onchange = () => { refreshAdditionalOnServiceChange(); updateCalculator(); };
-        document.getElementById('carType').onchange = () => updateCalculator();
-        document.getElementById('wheelDiameter').onchange = () => updateCalculator();
-        document.getElementById('discountCard').onchange = () => updateCalculator();
-        document.getElementById('additionalBlock').addEventListener('change', () => updateCalculator());
-        updateCalculator();
-    }
-    
-    function renderScreen1() {
+        if (num === 4) renderScreen4DateTime();
+        if (num === 5) {
+          renderScreen5();
+          startCountdown();
+          updateFormButtonState();
+        }
+        if (num === 6) renderScreen6();
+        if (num === 7) renderScreen7();
+      }
+
+      function renderScreen1() {
         let container = document.getElementById('servicesContainer');
+        if (!container) return;
         container.innerHTML = '';
-        servicesList.forEach(s => {
-            let div = document.createElement('div');
-            div.className = `option-card ${selectedService?.id === s.id ? 'selected' : ''}`;
-            div.innerHTML = `
-                <img src="${s.img}" alt="${s.name}" class="option-img" onerror="this.src='https://w7.pngwing.com/pngs/660/496/png-transparent-car-battery-charger-automotive-battery-dubai-sharjah-ajman-metropolitan-area-automotive-battery-car-vehicle-auto-part.png'">
-                <div class="option-info">
-                    <div class="option-title"><span>${s.name}</span></div>
-                    <div class="option-desc">${s.desc}</div>
-                    <div class="price-badge" style="margin-top:6px;">от ${s.price} ₽</div>
-                </div>
-            `;
-            div.onclick = () => { 
-                selectedService = s; 
-                renderScreen1(); 
-                showScreen(2);
-            };
-            container.appendChild(div);
+        servicesList.forEach((s) => {
+          let div = document.createElement('div');
+          div.className = `option-card ${selectedService?.id === s.id ? 'selected' : ''}`;
+          div.innerHTML = `
+            <img src="${s.img}" class="option-img" onerror="this.src='https://w7.pngwing.com/pngs/660/496/png-transparent-car-battery-charger-automotive-battery-dubai-sharjah-ajman-metropolitan-area-automotive-battery-car-vehicle-auto-part.png'">
+            <div class="option-info">
+              <div class="option-title"><span>${s.name}</span></div>
+              <div class="option-desc">${s.desc}</div>
+              <div class="price-badge" style="margin-top:6px;">от ${s.price} ₽</div>
+            </div>
+          `;
+          div.onclick = () => {
+            selectedService = s;
+            renderScreen1();
+            showScreen(2);
+          };
+          container.appendChild(div);
         });
-    }
-    
-    function renderScreen2() {
+      }
+
+      function renderScreen2() {
         let container = document.getElementById('locationsContainer');
+        if (!container) return;
         container.innerHTML = '';
-        locationsList.forEach(l => {
-            let div = document.createElement('div');
-            div.className = `address-item ${selectedLocation?.id === l.id ? 'selected' : ''}`;
-            div.innerHTML = `
-                <div class="address-icon">${locationIconSvg}</div>
-                <div class="address-text">${l.address}</div>
-            `;
-            div.onclick = () => { 
-                selectedLocation = l; 
-                renderScreen2(); 
-                showScreen(3);
-            };
-            container.appendChild(div);
+        const locationIconSvg = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6.0325 15.2873L12.0001 22L17.9677 15.2873C22.5447 10.1388 18.8894 2 12.0001 2C5.11079 2 1.45549 10.1388 6.0325 15.2873Z" stroke="#DE002B" stroke-width="1.8"/><circle cx="12" cy="10" r="3" stroke="#DE002B" stroke-width="1.8"/></svg>`;
+        locationsList.forEach((l) => {
+          let div = document.createElement('div');
+          div.className = `address-item ${selectedLocation?.id === l.id ? 'selected' : ''}`;
+          div.innerHTML = `<div class="address-icon">${locationIconSvg}</div><div class="address-text">${l.address}</div>`;
+          div.onclick = () => {
+            selectedLocation = l;
+            renderScreen2();
+            showScreen(3);
+          };
+          container.appendChild(div);
         });
-    }
-    
-    function renderScreen3() {
+      }
+
+      function renderScreen4DateTime() {
         let daysContainer = document.getElementById('weekdaysContainer');
-        daysContainer.innerHTML = '';
-        weekdays.forEach((day, idx) => {
+        if (daysContainer) {
+          daysContainer.innerHTML = '';
+          weekdaysData.forEach((day, idx) => {
             let div = document.createElement('div');
             div.className = `day-btn ${selectedDayIndex === idx ? 'selected-day' : ''}`;
-            div.innerText = day;
-            div.onclick = () => { selectedDayIndex = idx; renderScreen3(); };
+            div.innerHTML = `${day.name}<span>${day.date}</span>`;
+            div.onclick = () => {
+              selectedDayIndex = idx;
+              renderScreen4DateTime();
+              updateDateTimeButtonState();
+            };
             daysContainer.appendChild(div);
-        });
-        
+          });
+        }
         let timesContainer = document.getElementById('timesContainer');
-        timesContainer.innerHTML = '';
-        timeSlots.forEach(t => {
+        if (timesContainer) {
+          timesContainer.innerHTML = '';
+          timeSlots.forEach((t) => {
             let div = document.createElement('div');
             div.className = `time-slot ${selectedTime === t ? 'selected-time' : ''}`;
             div.innerText = t;
-            div.onclick = () => { selectedTime = t; renderScreen3(); };
+            div.onclick = () => {
+              selectedTime = t;
+              renderScreen4DateTime();
+              updateDateTimeButtonState();
+            };
             timesContainer.appendChild(div);
-        });
-        initCalculator();
-    }
-    
-    function renderScreen4() {
-        let container = document.getElementById('confirmDetails');
+          });
+        }
+        updateDateTimeButtonState();
+      }
+
+      function updateDateTimeButtonState() {
+        const toFormBtn = document.getElementById('toFormBtn');
+        if (toFormBtn) {
+          toFormBtn.disabled = !(selectedDayIndex !== null && selectedTime);
+        }
+      }
+
+      function renderScreen5() {
         let service = selectedService || servicesList[0];
         let location = selectedLocation || locationsList[0];
-        let dayName = weekdaysFull[selectedDayIndex];
-        container.innerHTML = `
-            <div class="detail-row"><div class="detail-label">Услуга и сервис</div><div class="detail-value">${service.name}<br>${location.address}</div></div>
-            <div class="detail-row"><div class="detail-label">Дата и время</div><div class="detail-value">${dayName}, ${selectedTime}</div></div>
-            <div class="detail-row"><div class="detail-label">Параметры шиномонтажа</div><div class="detail-value">${calcData.serviceName}, ${calcData.carType === 'sedan' ? 'Легковой' : (calcData.carType === 'crossover' ? 'Кроссовер' : 'Внедорожник')} ${calcData.diameter}″</div></div>
-            <div class="detail-row"><div class="detail-label">Доп. услуги / скидка</div><div class="detail-value">${calcData.additionalSum > 0 ? `Допы: +${calcData.additionalSum}₽` : 'Нет доп. услуг'} ${calcData.discountAmount > 0 ? `Скидка: -${calcData.discountAmount}₽` : ''}</div></div>
-            <div class="detail-row"><div class="detail-label">Итоговая стоимость</div><div class="detail-value" style="font-size:1.4rem; color:#de002b;">${calcData.finalPrice.toLocaleString('ru-RU')} ₽</div></div>
+        let selectedDay = weekdaysData[selectedDayIndex] || weekdaysData[0];
+        let shortAddress =
+          location.address.length > 40
+            ? location.address.substring(0, 40) + '...'
+            : location.address;
+
+        document.getElementById('bookingInfoPreview').innerHTML = `
+          <p><strong>Вы записываетесь:</strong></p>
+          <p>📋 ${service.name}</p>
+          <p>📅 ${selectedDay.date} в ${selectedTime}</p>
+          <p>📍 ${shortAddress}</p>
+          <div class="service-line">⚙️ ${currentCalcParams.carType} • ${currentCalcParams.diameter}″ • ${currentCalcParams.serviceName}</div>
         `;
-    }
-    
-    function renderScreen5() {
-        let location = selectedLocation || locationsList[0];
-        document.getElementById('successInfo').innerHTML = `
-            <div style="font-weight:800; font-size:1.2rem;">✅ Ваша запись</div>
-            <div style="margin-top:8px;">на ${weekdaysFull[selectedDayIndex]} в ${selectedTime}<br><strong>${location.address}</strong></div>
-            <div class="phone-mock">📞 Введите номер телефона</div>
-        `;
-        document.getElementById('extraInfo').innerHTML = `
-            <div class="detail-row">⏱ 25 мин. включительно: ${selectedTime}</div>
-            <div class="detail-row">Действительная автовыемкость<br>Компьютерная диагностика<br><strong>${location.address}</strong></div>
-        `;
-    }
-    
-    function showScreen(num) {
-        for (let i = 1; i <= 5; i++) {
-            document.getElementById(`screen${i}`).classList.remove('active');
+
+        document.getElementById('phoneInput').value = formData.phone;
+        document.getElementById('lastNameInput').value = formData.lastName;
+        document.getElementById('firstNameInput').value = formData.firstName;
+        document.getElementById('emailInput').value = formData.email;
+        document.getElementById('commentInput').value = formData.comment;
+
+        const inputs = ['phoneInput', 'lastNameInput', 'firstNameInput', 'emailInput'];
+        inputs.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.removeEventListener('input', updateFormButtonState);
+            el.addEventListener('input', updateFormButtonState);
+          }
+        });
+        updateFormButtonState();
+      }
+
+      function updateFormButtonState() {
+        const toConfirmBtn = document.getElementById('toConfirmFromForm');
+        if (!toConfirmBtn) return;
+        
+        const phone = document.getElementById('phoneInput')?.value.trim() || '';
+        const lastName = document.getElementById('lastNameInput')?.value.trim() || '';
+        const firstName = document.getElementById('firstNameInput')?.value.trim() || '';
+        const email = document.getElementById('emailInput')?.value.trim() || '';
+        
+        const isPhoneValid = validatePhone(phone);
+        const isLastNameValid = lastName !== '';
+        const isFirstNameValid = firstName !== '';
+        const isEmailValid = email === '' || validateEmail(email);
+        
+        toConfirmBtn.disabled = !(isPhoneValid && isLastNameValid && isFirstNameValid && isEmailValid);
+      }
+
+      function validatePhone(phone) {
+        const digits = phone.replace(/[^0-9]/g, '');
+        return digits.length >= 10;
+      }
+
+      function validateEmail(email) {
+        if (!email) return true;
+        const re = /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/;
+        return re.test(email);
+      }
+
+      function validateFormForSave() {
+        let isValid = true;
+        const phone = document.getElementById('phoneInput').value.trim();
+        const lastName = document.getElementById('lastNameInput').value.trim();
+        const firstName = document.getElementById('firstNameInput').value.trim();
+        const email = document.getElementById('emailInput').value.trim();
+
+        if (!validatePhone(phone)) {
+          document.getElementById('phoneError').classList.add('show');
+          document.getElementById('phoneInput').classList.add('input-error');
+          isValid = false;
+        } else {
+          document.getElementById('phoneError').classList.remove('show');
+          document.getElementById('phoneInput').classList.remove('input-error');
         }
-        document.getElementById(`screen${num}`).classList.add('active');
-        if (num === 1) renderScreen1();
-        if (num === 2) renderScreen2();
-        if (num === 3) renderScreen3();
-        if (num === 4) renderScreen4();
-        if (num === 5) renderScreen5();
-    }
-    
-    // Обработчики кнопок
-    document.getElementById('backToScreen1Btn').onclick = () => showScreen(1);
-    document.getElementById('backToScreen2Btn').onclick = () => showScreen(2);
-    document.getElementById('toScreen4Btn').onclick = () => showScreen(4);
-    document.getElementById('backToScreen3Btn').onclick = () => showScreen(3);
-    document.getElementById('toScreen5Btn').onclick = () => showScreen(5);
-    document.getElementById('newBookingBtn').onclick = () => { 
-        selectedService = null; 
-        selectedLocation = null; 
-        selectedDayIndex = 0; 
-        selectedTime = '11:00'; 
-        showScreen(1); 
-    };
-    document.getElementById('addToCalendarBtn').onclick = () => alert('Событие добавлено в календарь (напоминание)');
-    document.getElementById('menuBookingBtn').onclick = () => { selectedLocation = null; showScreen(1); };
-    
-    // Инициализация и старт
-    renderScreen1();
-    showScreen(1);
-</script>
-</body>
+
+        if (!lastName) {
+          document.getElementById('lastNameError').classList.add('show');
+          document.getElementById('lastNameInput').classList.add('input-error');
+          isValid = false;
+        } else {
+          document.getElementById('lastNameError').classList.remove('show');
+          document.getElementById('lastNameInput').classList.remove('input-error');
+        }
+
+        if (!firstName) {
+          document.getElementById('firstNameError').classList.add('show');
+          document.getElementById('firstNameInput').classList.add('input-error');
+          isValid = false;
+        } else {
+          document.getElementById('firstNameError').classList.remove('show');
+          document.getElementById('firstNameInput').classList.remove('input-error');
+        }
+
+        if (email && !validateEmail(email)) {
+          document.getElementById('emailError').classList.add('show');
+          document.getElementById('emailInput').classList.add('input-error');
+          isValid = false;
+        } else {
+          document.getElementById('emailError').classList.remove('show');
+          document.getElementById('emailInput').classList.remove('input-error');
+        }
+
+        return isValid;
+      }
+
+      function saveFormData() {
+        formData.phone = document.getElementById('phoneInput').value.trim();
+        formData.lastName = document.getElementById('lastNameInput').value.trim();
+        formData.firstName = document.getElementById('firstNameInput').value.trim();
+        formData.email = document.getElementById('emailInput').value.trim();
+        formData.comment = document.getElementById('commentInput').value.trim();
+      }
+
+      function renderScreen6() {
+        let service = selectedService || servicesList[0];
+        let location = selectedLocation || locationsList[0];
+        let selectedDay = weekdaysData[selectedDayIndex] || weekdaysData[0];
+
+        let detailsDiv = document.getElementById('confirmDetails');
+        if (detailsDiv) {
+          detailsDiv.innerHTML = `
+            <div class="confirm-item" data-edit="service">
+              <div class="confirm-label">Услуга</div>
+              <div class="confirm-value">${service.name}<span class="edit-icon">✎</span></div>
+            </div>
+            <div class="confirm-item" data-edit="location">
+              <div class="confirm-label">Сервис</div>
+              <div class="confirm-value">${location.address}<span class="edit-icon">✎</span></div>
+            </div>
+            <div class="confirm-item" data-edit="params">
+              <div class="confirm-label">Параметры</div>
+              <div class="confirm-value">${currentCalcParams.carType}<br>${currentCalcParams.diameter}″<br>${currentCalcParams.serviceName}<span class="edit-icon">✎</span></div>
+            </div>
+            <div class="confirm-item" data-edit="datetime">
+              <div class="confirm-label">Дата и время</div>
+              <div class="confirm-value">${selectedDay.date}, ${selectedDay.full}<br>${selectedTime}<span class="edit-icon">✎</span></div>
+            </div>
+            <div class="confirm-item" data-edit="contact">
+              <div class="confirm-label">Контактные данные</div>
+              <div class="confirm-value">${formData.lastName} ${formData.firstName}<br>${formData.phone}<br>${formData.email || 'не указан'}<span class="edit-icon">✎</span></div>
+            </div>
+            ${formData.comment ? `<div class="confirm-item">
+              <div class="confirm-label">Комментарий</div>
+              <div class="confirm-value">${formData.comment}</div>
+            </div>` : ''}
+            <div class="confirm-item">
+              <div class="confirm-label">Итого</div>
+              <div class="confirm-value price-large">${currentTotalPrice.toLocaleString('ru-RU')} ₽</div>
+            </div>
+          `;
+
+          document.querySelectorAll('.confirm-item[data-edit]').forEach((item) => {
+            item.addEventListener('click', () => {
+              const editType = item.getAttribute('data-edit');
+              if (editType === 'service') showScreen(1);
+              else if (editType === 'location') showScreen(2);
+              else if (editType === 'params') showScreen(3);
+              else if (editType === 'datetime') showScreen(4);
+              else if (editType === 'contact') showScreen(5);
+            });
+          });
+        }
+      }
+
+      function renderScreen7() {
+        let location = selectedLocation || locationsList[0];
+        let selectedDay = weekdaysData[selectedDayIndex] || weekdaysData[0];
+        let shortAddress =
+          location.address.length > 35
+            ? location.address.substring(0, 35) + '...'
+            : location.address;
+
+        document.getElementById('successDateTime').innerHTML = `на ${selectedDay.date} в ${selectedTime}`;
+        document.getElementById('successAddress').innerHTML = shortAddress;
+        if (countdownInterval) clearInterval(countdownInterval);
+      }
+
+      function formatPhone(input) {
+        let digits = input.value.replace(/[^0-9]/g, '');
+        if (digits.length > 11) digits = digits.slice(0, 11);
+        let formatted = '+7';
+        if (digits.length > 1) {
+          formatted += ' (' + digits.slice(1, 4);
+        }
+        if (digits.length >= 4) {
+          formatted += ') ' + digits.slice(4, 7);
+        }
+        if (digits.length >= 7) {
+          formatted += '-' + digits.slice(7, 9);
+        }
+        if (digits.length >= 9) {
+          formatted += '-' + digits.slice(9, 11);
+        }
+        input.value = formatted;
+        updateFormButtonState();
+      }
+
+      // Обработчики
+      document.getElementById('backToScreen1Btn')?.addEventListener('click', () => showScreen(1));
+      document.getElementById('backToScreen2FromCalc')?.addEventListener('click', () => showScreen(2));
+      document.getElementById('backToScreen3FromDateTime')?.addEventListener('click', () => showScreen(3));
+      document.getElementById('backToScreen4FromForm')?.addEventListener('click', () => showScreen(4));
+      document.getElementById('backToScreen5FromConfirm')?.addEventListener('click', () => showScreen(5));
+
+      document.getElementById('toScreen4Btn')?.addEventListener('click', () => {
+        if (currentTotalPrice > 0) showScreen(4);
+      });
+
+      document.getElementById('toFormBtn')?.addEventListener('click', () => {
+        showScreen(5);
+      });
+
+      document.getElementById('toConfirmFromForm')?.addEventListener('click', () => {
+        if (validateFormForSave()) {
+          saveFormData();
+          showScreen(6);
+        }
+      });
+
+      document.getElementById('toScreen7Btn')?.addEventListener('click', () => showScreen(7));
+
+      document.getElementById('addToCalendarFinalBtn')?.addEventListener('click', () => alert('Событие добавлено в календарь'));
+      document.getElementById('myBookingsBtn')?.addEventListener('click', () => alert('Переход к моим записям'));
+      document.getElementById('newBookingFinalBtn')?.addEventListener('click', () => resetToStart());
+
+      const phoneInput = document.getElementById('phoneInput');
+      if (phoneInput) {
+        phoneInput.addEventListener('input', () => formatPhone(phoneInput));
+      }
+
+      // КАЛЬКУЛЯТОР
+      const calculatorHTML = `
+        <style>
+          .shinopoisk-calculator, .shinopoisk-calculator * { margin: 0; padding: 0; box-sizing: border-box; }
+          .shinopoisk-calculator { font-family: 'Segoe UI', Roboto, sans-serif; width: 100%; background: #ffffff; border-radius: 32px; box-shadow: 0 20px 35px -10px rgba(222,0,43,0.2); overflow: hidden; border: 1px solid #ffcdcd; }
+          .shinopoisk-calculator .calc-header { background: #de002b; padding: 22px 28px; }
+          .shinopoisk-calculator .calc-header h1 { font-size: 1.8rem; font-weight: 700; color: white; margin: 0; }
+          .shinopoisk-calculator .calc-body { padding: 28px 28px 34px; }
+          .shinopoisk-calculator .field-group { margin-bottom: 24px; }
+          .shinopoisk-calculator label { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; color: #de002b; margin-bottom: 8px; }
+          .shinopoisk-calculator .custom-select { width: 100%; padding: 12px 16px; font-size: 1rem; border: 1.5px solid #f0c0c0; border-radius: 28px; background: white; cursor: pointer; appearance: none; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%23de002b" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>'); background-repeat: no-repeat; background-position: right 16px center; }
+          .shinopoisk-calculator .discount-check { display: flex; align-items: center; gap: 12px; margin: 20px 0 28px; }
+          .shinopoisk-calculator .discount-check input { width: 20px; height: 20px; accent-color: #de002b; }
+          .shinopoisk-calculator .button-group { display: flex; gap: 16px; margin-bottom: 30px; flex-wrap: wrap; }
+          .shinopoisk-calculator .calc-button, .shinopoisk-calculator .reset-button { flex: 0 1 auto; min-width: 160px; padding: 12px 24px; font-size: 16px; font-weight: 600; border-radius: 40px; cursor: pointer; border: none; }
+          .shinopoisk-calculator .calc-button { background: #de002b; color: white; }
+          .shinopoisk-calculator .reset-button { background: #fff0f0; color: #de002b; border: 1px solid #ffbcbc; }
+          .shinopoisk-calculator .price-result { background: #fffafa; border-radius: 28px; padding: 20px 24px; border-left: 6px solid #de002b; margin-bottom: 20px; }
+          .shinopoisk-calculator .price-label { font-size: 16px; text-transform: uppercase; font-weight: 700; color: #de002b; }
+          .shinopoisk-calculator .final-price { font-size: 32px; font-weight: 800; color: #de002b; }
+          .shinopoisk-calculator .final-price.line-through { text-decoration: line-through; color: #b98b8b; font-size: 24px; }
+          .shinopoisk-calculator .final-price-discounted { font-size: 32px; font-weight: 800; color: #de002b; margin-top: 5px; }
+          .shinopoisk-calculator .discount-info { background: #e8f5e9; border-radius: 12px; padding: 10px 15px; margin-top: 12px; display: flex; justify-content: space-between; }
+          .shinopoisk-calculator .service-detail { font-size: 14px; margin-top: 12px; color: #b76b6b; border-top: 1px dashed #ffcdcd; padding-top: 10px; }
+          .shinopoisk-calculator .additional-services { margin-top: 28px; background: #ffffff; border-radius: 28px; border: 1px solid #ffdddd; }
+          .shinopoisk-calculator .additional-title { background: #fff8f8; padding: 16px 20px; font-weight: 700; font-size: 16px; color: #de002b; border-bottom: 1px solid #ffdddd; }
+          .shinopoisk-calculator .services-grid { padding: 16px 20px; display: flex; flex-direction: column; gap: 8px; }
+          .shinopoisk-calculator .service-check { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 20px; cursor: pointer; }
+          .shinopoisk-calculator .service-check:hover { background: rgba(222,0,43,0.08); }
+          .shinopoisk-calculator .service-check input { width: 18px; height: 18px; accent-color: #de002b; }
+          .shinopoisk-calculator .service-check label { flex: 1; font-weight: 500; cursor: pointer; }
+          .shinopoisk-calculator .service-price { color: #de002b; font-weight: 600; }
+          .shinopoisk-calculator .subgroup { margin-top: 8px; padding-top: 12px; border-top: 1px dashed #ffcdcd; }
+          .shinopoisk-calculator .subgroup-title { font-weight: 700; color: #de002b; margin-bottom: 12px; }
+          .shinopoisk-calculator .total-additional { margin-top: 18px; padding: 12px 20px; background: #fff8f8; display: flex; justify-content: space-between; font-weight: 700; }
+          .shinopoisk-calculator .grand-total { margin-top: 20px; padding: 14px 20px; background: #fff1f1; border-radius: 28px; display: flex; justify-content: space-between; font-weight: 800; }
+          .shinopoisk-calculator .note { font-size: 12px; color: #b98b8b; margin-top: 16px; text-align: center; }
+          .shinopoisk-calculator .radio-group { display: flex; flex-direction: column; gap: 8px; }
+          .shinopoisk-calculator .radio-option { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 20px; cursor: pointer; }
+          .shinopoisk-calculator .radio-option:hover { background: rgba(222,0,43,0.08); }
+          .shinopoisk-calculator .radio-option input { width: 18px; height: 18px; accent-color: #de002b; }
+          .shinopoisk-calculator .hidden-result { display: none !important; }
+        </style>
+        <div class="shinopoisk-calculator">
+          <div class="calc-header"><h1>Стоимость шиномонтажа</h1></div>
+          <div class="calc-body">
+            <div class="field-group"><label>Тип автомобиля</label><select id="carType" class="custom-select"><option value="sedan">Легковой автомобиль</option><option value="crossover_minivan">Кроссовер / Минивэн</option><option value="suv">Внедорожник (SUV)</option></select></div>
+            <div class="field-group"><label>Диаметр колеса (дюймы)</label><select id="wheelDiameter" class="custom-select"></select></div>
+            <div class="field-group"><label>Выберите услугу</label><select id="serviceType" class="custom-select"><option value="complex_set">Комплекс шиномонтажа (комплект)</option><option value="complex_single">Комплекс шиномонтажа (1 колесо)</option><option value="mount_dismount_set">Снятие и установка (комплект)</option><option value="mount_dismount_single">Снятие и установка (1 колесо)</option><option value="tire_remount_set">Шиномонтаж: демонтаж + монтаж (комплект)</option><option value="tire_remount_single">Шиномонтаж: демонтаж + монтаж (1 колесо)</option><option value="balancing_set">Балансировка (комплект)</option><option value="balancing_single">Балансировка (1 колесо)</option></select></div>
+            <div class="discount-check"><input type="checkbox" id="discountCard"><label>У меня есть дисконтная карта</label></div>
+            <div class="button-group"><button class="calc-button" id="calculateBtn">Рассчитать стоимость</button><button class="reset-button" id="resetBtn">Сбросить всё</button></div>
+            <div id="priceResultBlock" class="price-result hidden-result"><div class="price-label">ИТОГОВАЯ СТОИМОСТЬ</div><div class="final-price-wrapper" id="finalPriceWrapper"></div><div id="discountInfoBlock" class="discount-info" style="display: none;"></div><div id="serviceDetailBlock" class="service-detail"></div></div>
+            <div id="additionalBlock" class="hidden-result"><div class="additional-services"><div class="additional-title">Дополнительные услуги</div><div class="services-grid" id="additionalChecklist"></div><div class="total-additional"><span>Дополнительные услуги:</span><span id="additionalCost">0 ₽</span></div><div class="grand-total"><span>Итого (услуга + допы):</span><span id="grandTotalSum">0 ₽</span></div></div></div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('calculatorContainer').innerHTML = calculatorHTML;
+
+      // Скрипт калькулятора
+      (function () {
+        const sedanPrices = {
+          13: { complex_set: 1800 },
+          14: { complex_set: 1800 },
+          15: { complex_set: 2080 },
+          16: { complex_set: 2260 },
+          17: { complex_set: 2520 },
+          18: { complex_set: 2760 },
+          19: { complex_set: 3200 },
+          20: { complex_set: 3500 },
+        };
+        const crossoverPrices = {
+          13: { complex_set: 2360 },
+          16: { complex_set: 2660 },
+          17: { complex_set: 2940 },
+          18: { complex_set: 3200 },
+          19: { complex_set: 3400 },
+          20: { complex_set: 3600 },
+        };
+        const suvPrices = {
+          13: { complex_set: 2600 },
+          16: { complex_set: 2940 },
+          17: { complex_set: 3240 },
+          18: { complex_set: 3520 },
+          19: { complex_set: 3740 },
+          20: { complex_set: 3960 },
+        };
+        function getBasePrice(c, t, d) {
+          let table = c === 'sedan' ? sedanPrices : c === 'crossover_minivan' ? crossoverPrices : suvPrices;
+          let dd = Math.min(20, Math.max(13, d));
+          return table[dd]?.[t] || 1500;
+        }
+        function getWheelsCountMultiplier() {
+          let s = document.getElementById('serviceType');
+          return s && s.value.includes('_set') ? 4 : 1;
+        }
+        function getSelectedTireType() {
+          let radios = ['tire_at', 'tire_mt', 'runflat'];
+          for (let id of radios) {
+            let el = document.getElementById(id);
+            if (el && el.checked) return { price: id === 'tire_at' ? 100 : 150 };
+          }
+          return null;
+        }
+        function computeMainTotal() {
+          let car = document.getElementById('carType').value;
+          let diam = parseInt(document.getElementById('wheelDiameter').value, 10);
+          let serv = document.getElementById('serviceType').value;
+          let base = getBasePrice(car, serv, diam);
+          let disc = document.getElementById('discountCard').checked ? Math.round(base * 0.15) : 0;
+          return { base, discount: disc, final: base - disc };
+        }
+        function getAdditionalSum() {
+          let sum = 0, mult = getWheelsCountMultiplier();
+          let tire = getSelectedTireType();
+          if (tire) sum += tire.price * mult;
+          if (document.getElementById('low_profile')?.checked) sum += 100 * mult;
+          if (document.getElementById('valve')?.checked) sum += 75;
+          if (document.getElementById('mount_camera')?.checked) sum += 50;
+          if (document.getElementById('demount_camera')?.checked) sum += 50;
+          if (document.getElementById('repair_cord')?.checked) sum += 250;
+          if (document.getElementById('repair_patch')?.checked) sum += 250;
+          if (document.getElementById('tpms_program')?.checked) sum += 1000;
+          return sum;
+        }
+        function calculateAndShow() {
+          let main = computeMainTotal();
+          let add = getAdditionalSum();
+          let grand = main.final + add;
+          let wrapper = document.getElementById('finalPriceWrapper');
+          if (wrapper) {
+            if (main.discount > 0) {
+              wrapper.innerHTML = `<div class="final-price line-through">${(main.base + add).toLocaleString()} ₽</div><div class="final-price-discounted">${grand.toLocaleString()} ₽</div>`;
+              let db = document.getElementById('discountInfoBlock');
+              if (db) {
+                db.style.display = 'flex';
+                db.innerHTML = `<span>Скидка по дисконтной карте 15%</span><span>-${main.discount}₽</span>`;
+              }
+            } else {
+              wrapper.innerHTML = `<div class="final-price">${grand.toLocaleString()} ₽</div>`;
+              let db = document.getElementById('discountInfoBlock');
+              if (db) db.style.display = 'none';
+            }
+          }
+          let sd = document.getElementById('serviceDetailBlock');
+          if (sd) {
+            let carName = document.getElementById('carType').options[document.getElementById('carType').selectedIndex]?.text || '';
+            let diam = document.getElementById('wheelDiameter').value;
+            let servName = document.getElementById('serviceType').options[document.getElementById('serviceType').selectedIndex]?.text || '';
+            sd.innerHTML = `${carName} • ${diam}″ • ${servName}`;
+            currentCalcParams = { carType: carName, diameter: diam, serviceName: servName };
+          }
+          let ac = document.getElementById('additionalCost');
+          if (ac) ac.innerText = add.toLocaleString() + ' ₽';
+          let gs = document.getElementById('grandTotalSum');
+          if (gs) gs.innerText = grand.toLocaleString() + ' ₽';
+          let pb = document.getElementById('priceResultBlock');
+          if (pb) pb.classList.remove('hidden-result');
+          let ab = document.getElementById('additionalBlock');
+          if (ab) ab.classList.remove('hidden-result');
+          currentTotalPrice = grand;
+          let ts = document.getElementById('totalPriceSpan');
+          if (ts) ts.innerText = grand.toLocaleString() + ' ₽';
+          
+          const toScreen4Btn = document.getElementById('toScreen4Btn');
+          if (toScreen4Btn) toScreen4Btn.disabled = false;
+        }
+        function resetAll() {
+          document.getElementById('carType').value = 'sedan';
+          document.getElementById('wheelDiameter').value = '16';
+          document.getElementById('serviceType').selectedIndex = 0;
+          document.getElementById('discountCard').checked = false;
+          document.querySelectorAll('#additionalBlock input').forEach((i) => (i.checked = false));
+          let pb = document.getElementById('priceResultBlock');
+          if (pb) pb.classList.add('hidden-result');
+          let ab = document.getElementById('additionalBlock');
+          if (ab) ab.classList.add('hidden-result');
+          currentTotalPrice = 0;
+          let ts = document.getElementById('totalPriceSpan');
+          if (ts) ts.innerText = '0 ₽';
+          const toScreen4Btn = document.getElementById('toScreen4Btn');
+          if (toScreen4Btn) toScreen4Btn.disabled = true;
+        }
+        function buildChecklist() {
+          return `<div class="subgroup"><div class="subgroup-title">Типы шин (доплата)</div><div class="radio-group"><div class="radio-option"><input type="radio" name="tireType" id="tire_at"><label>Шины AT</label><span class="service-price">100 ₽/колесо</span></div><div class="radio-option"><input type="radio" name="tireType" id="tire_mt"><label>Шины MT</label><span class="service-price">150 ₽/колесо</span></div><div class="radio-option"><input type="radio" name="tireType" id="runflat"><label>Run Flat</label><span class="service-price">150 ₽/колесо</span></div></div></div><div class="subgroup"><div class="subgroup-title">Прочие услуги</div><div class="service-check"><input type="checkbox" id="low_profile"><label>Низкий профиль (&lt;45)</label><span class="service-price">100 ₽/колесо</span></div><div class="service-check"><input type="checkbox" id="valve"><label>Установка вентиля</label><span class="service-price">75 ₽</span></div><div class="service-check"><input type="checkbox" id="mount_camera"><label>Монтаж камеры</label><span class="service-price">50 ₽</span></div><div class="service-check"><input type="checkbox" id="demount_camera"><label>Демонтаж камеры</label><span class="service-price">50 ₽</span></div></div><div class="subgroup"><div class="subgroup-title">Ремонт покрышки</div><div class="service-check"><input type="checkbox" id="repair_cord"><label>Установка жгута</label><span class="service-price">250 ₽</span></div><div class="service-check"><input type="checkbox" id="repair_patch"><label>Установка заплатки</label><span class="service-price">250 ₽</span></div></div><div class="subgroup"><div class="subgroup-title">TPMS</div><div class="service-check"><input type="checkbox" id="tpms_program"><label>Программирование / адаптация</label><span class="service-price">1000 ₽</span></div></div>`;
+        }
+        function init() {
+          let diam = document.getElementById('wheelDiameter');
+          if (diam && diam.children.length === 0) {
+            for (let i = 13; i <= 20; i++) {
+              let opt = document.createElement('option');
+              opt.value = i;
+              opt.textContent = i;
+              if (i === 16) opt.selected = true;
+              diam.appendChild(opt);
+            }
+          }
+          let checklist = document.getElementById('additionalChecklist');
+          if (checklist && checklist.children.length === 0) {
+            checklist.innerHTML = buildChecklist();
+          }
+          document.getElementById('calculateBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            calculateAndShow();
+          });
+          document.getElementById('resetBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            resetAll();
+          });
+          let pb = document.getElementById('priceResultBlock');
+          if (pb) pb.classList.add('hidden-result');
+          let ab = document.getElementById('additionalBlock');
+          if (ab) ab.classList.add('hidden-result');
+          const toScreen4Btn = document.getElementById('toScreen4Btn');
+          if (toScreen4Btn) toScreen4Btn.disabled = true;
+        }
+        init();
+      })();
+
+      showScreen(1);
+    </script>
+  </body>
 </html>
